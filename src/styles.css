@@ -62,26 +62,26 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --radius: 0.5rem;
+  --background: oklch(0.977 0.004 250);
+  --foreground: oklch(0.22 0.03 255);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
+  --card-foreground: oklch(0.22 0.03 255);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --popover-foreground: oklch(0.22 0.03 255);
+  --primary: oklch(0.45 0.16 255);
+  --primary-foreground: oklch(0.985 0.005 250);
+  --secondary: oklch(0.945 0.012 250);
+  --secondary-foreground: oklch(0.3 0.04 255);
+  --muted: oklch(0.955 0.008 250);
+  --muted-foreground: oklch(0.52 0.03 253);
+  --accent: oklch(0.93 0.05 235);
+  --accent-foreground: oklch(0.3 0.07 250);
+  --destructive: oklch(0.55 0.22 27);
+  --destructive-foreground: oklch(0.985 0.003 248);
+  --border: oklch(0.9 0.012 253);
+  --input: oklch(0.9 0.012 253);
+  --ring: oklch(0.45 0.16 255);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -141,4 +141,60 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
   }
+}
+
+/* ============ Documento do certificado (fac-símile dos modelos DOCX) ============ */
+.doc-page {
+  width: 794px;
+  min-height: 1123px;
+  padding: 56px 60px 48px;
+  background: #ffffff;
+  color: #000000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  line-height: 1.35;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+.doc-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  border-bottom: 1px solid #000000;
+  padding-bottom: 10px;
+}
+.doc-logo { width: 160px; height: auto; }
+.doc-empresa { display: flex; flex-direction: column; font-size: 10px; }
+.doc-empresa strong { font-size: 13px; letter-spacing: 0.02em; }
+.doc-titulo {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 22px 0 4px;
+  letter-spacing: 0.03em;
+}
+.doc-subtitulo { text-align: center; font-size: 14px; font-weight: 700; margin: 0 0 14px; }
+.doc-intro { margin: 10px 0 12px; font-size: 11px; }
+.doc-tabela { width: 100%; border-collapse: collapse; margin-bottom: 14px; table-layout: fixed; }
+.doc-tabela th,
+.doc-tabela td {
+  border: 1px solid #000000;
+  padding: 5px 6px;
+  font-size: 10.5px;
+  text-align: left;
+  vertical-align: top;
+  word-break: break-word;
+}
+.doc-tabela th { font-weight: 700; }
+.doc-tabela-dados th { width: 18%; }
+.doc-tabela-dados td { width: 32%; }
+.doc-texto { margin: 0 0 10px; text-align: justify; font-size: 10.5px; }
+.doc-espaco { flex: 1 1 auto; min-height: 24px; }
+.doc-rodape {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #000000;
+  padding-top: 8px;
+  font-size: 11px;
 }
