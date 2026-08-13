@@ -1,8 +1,8 @@
 export type Lote = {
   nLote: string;
   qLote: string;
-  dFab?: string;
-  dVal?: string;
+  dFab?: string | undefined;
+  dVal?: string | undefined;
   loteFabricante: string;
 };
 
