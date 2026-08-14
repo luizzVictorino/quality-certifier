@@ -28,10 +28,18 @@ function Ribbon({ c }: { c: Certificado }) {
       <h1 className="doc-titulo">CERTIFICADO RIBBON</h1>
       <h2 className="doc-subtitulo">CERTIFICADO DE QUALIDADE</h2>
       <p className="doc-intro">
-        A <strong>SATO AUTO ID DO BRASIL</strong> concede este certificado para o produto:
+        A SATO AUTO ID DO BRASIL concede este certificado para o produto:
       </p>
 
       <table className="doc-tabela">
+        <colgroup>
+          <col style={{ width: "12%" }} />
+          <col style={{ width: "33%" }} />
+          <col style={{ width: "21%" }} />
+          <col style={{ width: "9%" }} />
+          <col style={{ width: "16%" }} />
+          <col style={{ width: "9%" }} />
+        </colgroup>
         <thead>
           <tr>
             <th>Codigo SATO</th>
@@ -42,6 +50,7 @@ function Ribbon({ c }: { c: Certificado }) {
             <th>Ent</th>
           </tr>
         </thead>
+
         <tbody>
           <tr>
             <td>{c.codigoSato}</td>
