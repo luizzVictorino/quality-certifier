@@ -102,17 +102,16 @@ function Ribbon({ c }: { c: Certificado }) {
       </table>
 
       <p className="doc-texto">
-        <strong>
-          Condições de armazenamento que devem ser obedecidas para garantir a validade do produto:
-        </strong>{" "}
-        Umidade de 20 a 80% e Temperatura de 5 a 35°C.
+        <strong>Condições de armazenamento</strong> que devem ser obedecidas para garantir a
+        validade do produto: Umidade de 20 a 80% e Temperatura de 5 a 35°C.
       </p>
-      <p className="doc-texto">Divergências/ Substituições/ Não-conformidades:</p>
+      <p className="doc-texto">
+        <strong>Divergências/ Substituições/ Não-conformidades:</strong>
+      </p>
       <p className="doc-texto">
         <strong>NÃO CONFORMIDADE:</strong> Nenhum material deverá ser devolvido sem prévia
-        comunicação a <strong>SATO BRASIL</strong>, inclusive em casos de divergência,
-        não-conformidade ou reposição. Toda e qualquer divergência receberá a devida tratativa pela
-        SATO.
+        comunicação a SATO BRASIL, inclusive em casos de divergência, não-conformidade ou
+        reposição.Toda e qualquer divergência receberá a devida tratativa pela SATO.
       </p>
       <p className="doc-texto">
         <strong>DECLARAÇÃO:</strong> SATO AUTO ID DO BRASIL declara que o material/ item
@@ -120,6 +119,7 @@ function Ribbon({ c }: { c: Certificado }) {
         solicitados na Ordem de Compra/Contrato. Além disto, as informações prestadas estão
         acuradas, completas e são verdadeiras.
       </p>
+
     </>
   );
 }
