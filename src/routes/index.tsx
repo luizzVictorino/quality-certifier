@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
-import { FileUp, FileText, Loader2, Download, Eye, Layers, FileArchive } from "lucide-react";
+import { FileUp, FileText, Loader2, Download, Eye, Layers, FileArchive, Save, Trash2 } from "lucide-react";
 import JSZip from "jszip";
 import { toast } from "sonner";
 
@@ -222,6 +222,13 @@ function Index() {
               <Button onClick={processar} disabled={!xmlText}>
                 Processar XML
               </Button>
+              <Button
+                variant="ghost"
+                onClick={limpar}
+                disabled={!xmlText && !resumo && !file}
+              >
+                <Trash2 /> Limpar
+              </Button>
             </div>
             {file && (
               <p className="mt-3 text-xs text-muted-foreground">
@@ -309,7 +316,7 @@ function Index() {
                       <TableCell>{c.unidade}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button size="sm" variant="ghost" onClick={() => setAberto(c.id)}>
+                          <Button size="sm" variant="ghost" onClick={() => abrir(c)}>
                             <Eye /> Visualizar
                           </Button>
                           <Button
