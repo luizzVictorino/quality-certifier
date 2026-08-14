@@ -41,41 +41,16 @@ export function EditorCertificado({ c, onChange }: Props) {
           value={c.modelo}
           onChange={(v) => set({ modelo: v })}
         />
-        {c.tipo === "ribbon" ? (
-          <>
-            <Campo label="Largura" value={c.largura} onChange={(v) => set({ largura: v })} />
-            <Campo
-              label="Comprimento"
-              value={c.comprimento}
-              onChange={(v) => set({ comprimento: v })}
-            />
-            <Campo label="Ent" value={c.entrega} onChange={(v) => set({ entrega: v })} />
-          </>
-        ) : (
-          <>
-            <Campo label="Medida" value={c.medida} onChange={(v) => set({ medida: v })} />
-            <Campo
-              label="Etiquetas x Rolo"
-              value={c.etiquetasPorRolo}
-              onChange={(v) => set({ etiquetasPorRolo: v })}
-            />
-            <Campo
-              label="Quantidade total"
-              value={c.quantidadeTotal}
-              onChange={(v) => set({ quantidadeTotal: v })}
-            />
-            <Campo
-              label="Pedido do Cliente"
-              value={c.pedidoCliente}
-              onChange={(v) => set({ pedidoCliente: v })}
-            />
-            <Campo
-              label="Pedido SATO"
-              value={c.pedidoSato}
-              onChange={(v) => set({ pedidoSato: v })}
-            />
-          </>
+        <Campo label="Largura" value={c.largura} onChange={(v) => set({ largura: v })} />
+        <Campo
+          label="Comprimento"
+          value={c.comprimento}
+          onChange={(v) => set({ comprimento: v })}
+        />
+        {c.tipo === "ribbon" && (
+          <Campo label="Ent" value={c.entrega} onChange={(v) => set({ entrega: v })} />
         )}
+
         <Campo label="Nota Fiscal" value={c.notaFiscal} onChange={(v) => set({ notaFiscal: v })} />
         <Campo label="Série" value={c.serie} onChange={(v) => set({ serie: v })} />
         <Campo
