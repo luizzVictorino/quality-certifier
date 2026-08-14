@@ -15,11 +15,12 @@ const Cabecalho = () => (
 const Rodape = ({ c }: { c: Certificado }) => (
   <div className="doc-rodape">
     <span>
-      Emitido: <strong>{c.emitidoPor}</strong>
+      {c.tipo === "ribbon" ? "Emitido:" : "Emitido por:"} {c.emitidoPor}
     </span>
     <span>Data: {c.dataEmissaoCertificado}</span>
   </div>
 );
+
 
 function Ribbon({ c }: { c: Certificado }) {
   return (
