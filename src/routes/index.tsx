@@ -345,42 +345,38 @@ function Index() {
       </div>
 
       {/* Visualização + edição */}
-      <Dialog open={!!emEdicao} onOpenChange={(o) => !o && setAberto(null)}>
+      <Dialog open={!!emEdicao && !!rascunho} onOpenChange={(o) => !o && fechar()}>
         <DialogContent className="max-h-[92vh] max-w-[1200px] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              Certificado {emEdicao?.codigoSato} —{" "}
-              {emEdicao?.tipo === "ribbon" ? "Ribbon" : "Etiqueta"}
+              Certificado {rascunho?.codigoSato} —{" "}
+              {rascunho?.tipo === "ribbon" ? "Ribbon" : "Etiqueta"}
             </DialogTitle>
           </DialogHeader>
-          {emEdicao && (
+          {rascunho && (
             <div className="grid gap-6 lg:grid-cols-[minmax(0,380px)_1fr]">
-              <EditorCertificado
-                c={emEdicao}
-                onChange={(next) =>
-                  setCerts((prev) => prev.map((x) => (x.id === next.id ? next : x)))
-                }
-              />
+              <EditorCertificado c={rascunho} onChange={setRascunho} />
               <div className="overflow-auto rounded-md border border-border bg-muted p-4">
                 <div className="origin-top-left scale-[0.72]">
-                  <CertificadoDoc c={emEdicao} />
+                  <CertificadoDoc c={rascunho} />
                 </div>
               </div>
             </div>
           )}
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setAberto(null)}>
+            <Button variant="outline" onClick={fechar}>
               Fechar
             </Button>
-            <Button
-              disabled={busy}
-              onClick={() => emEdicao && void baixarUm(emEdicao)}
-            >
+            <Button variant="secondary" onClick={salvarEdicao}>
+              <Save /> Salvar alterações
+            </Button>
+            <Button disabled={busy} onClick={() => emEdicao && void baixarUm(emEdicao)}>
               {busy ? <Loader2 className="animate-spin" /> : <Download />} Baixar PDF
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }
