@@ -127,44 +127,45 @@ function Ribbon({ c }: { c: Certificado }) {
 function Etiqueta({ c }: { c: Certificado }) {
   return (
     <>
-      <h1 className="doc-titulo">CERTIFICADO DE QUALIDADE</h1>
+      <h1 className="doc-titulo" style={{ marginBottom: 18 }}>
+        CERTIFICADO DE QUALIDADE
+      </h1>
 
       <table className="doc-tabela doc-tabela-dados">
         <tbody>
           <tr>
+            <th>Código SATO</th>
+            <td>{c.codigoSato}</td>
             <th>Cliente</th>
             <td>{c.cliente}</td>
-            <th>Codigo da Etiqueta</th>
-            <td>{c.codigoSato}</td>
-          </tr>
-          <tr>
-            <th>Produto</th>
-            <td>{c.modelo}</td>
-            <th>Medida</th>
-            <td>{c.medida}</td>
-          </tr>
-          <tr>
-            <th>Etiquetas x Rolo</th>
-            <td>{c.etiquetasPorRolo}</td>
-            <th>Quantidade</th>
-            <td>
-              {c.quantidadeTotal} {c.unidade}
-            </td>
           </tr>
           <tr>
             <th>Nota Fiscal</th>
             <td>{c.notaFiscal}</td>
-            <th>Pedido do Cliente</th>
-            <td>{c.pedidoCliente}</td>
+            <th>Série</th>
+            <td>{c.serie}</td>
           </tr>
           <tr>
-            <th>Pedido SATO</th>
-            <td>{c.pedidoSato}</td>
-            <th>Data da NF</th>
+            <th>Data de Emissão</th>
             <td>{c.dataEmissao}</td>
+            <th>Unidade</th>
+            <td>{c.unidade}</td>
+          </tr>
+          <tr>
+            <th>Modelo</th>
+            <td>{c.modelo}</td>
+            <th>Comprimento</th>
+            <td>{c.comprimento}</td>
+          </tr>
+          <tr>
+            <th>Largura</th>
+            <td>{c.largura}</td>
+            <th>&nbsp;</th>
+            <td>&nbsp;</td>
           </tr>
         </tbody>
       </table>
+
 
       <table className="doc-tabela">
         <thead>
