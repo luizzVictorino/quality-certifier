@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
-import { FileUp, FileText, Loader2, Download, Eye, Layers, FileArchive } from "lucide-react";
+import { FileUp, FileText, Loader2, Download, Eye, Layers, FileArchive, Save, Trash2 } from "lucide-react";
 import JSZip from "jszip";
 import { toast } from "sonner";
 
@@ -59,10 +59,41 @@ function Index() {
   const [erro, setErro] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [aberto, setAberto] = useState<string | null>(null);
+  const [rascunho, setRascunho] = useState<Certificado | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const docRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const emEdicao = useMemo(() => certs.find((c) => c.id === aberto) ?? null, [certs, aberto]);
+
+  const abrir = (c: Certificado) => {
+    setRascunho({ ...c, lotes: c.lotes.map((l) => ({ ...l })) });
+    setAberto(c.id);
+  };
+
+  const fechar = () => {
+    setAberto(null);
+    setRascunho(null);
+  };
+
+  const salvarEdicao = () => {
+    if (!rascunho) return;
+    setCerts((prev) => prev.map((x) => (x.id === rascunho.id ? rascunho : x)));
+    toast.success("Informações do certificado salvas.");
+    fechar();
+  };
+
+  const limpar = () => {
+    setFile(null);
+    setXmlText("");
+    setResumo(null);
+    setCerts([]);
+    setErro(null);
+    fechar();
+    docRefs.current = {};
+    if (inputRef.current) inputRef.current.value = "";
+    toast.success("Informações do XML removidas.");
+  };
+
 
   const selecionar = async (f: File) => {
     setErro(null);
@@ -191,6 +222,13 @@ function Index() {
               <Button onClick={processar} disabled={!xmlText}>
                 Processar XML
               </Button>
+              <Button
+                variant="ghost"
+                onClick={limpar}
+                disabled={!xmlText && !resumo && !file}
+              >
+                <Trash2 /> Limpar
+              </Button>
             </div>
             {file && (
               <p className="mt-3 text-xs text-muted-foreground">
@@ -278,7 +316,7 @@ function Index() {
                       <TableCell>{c.unidade}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button size="sm" variant="ghost" onClick={() => setAberto(c.id)}>
+                          <Button size="sm" variant="ghost" onClick={() => abrir(c)}>
                             <Eye /> Visualizar
                           </Button>
                           <Button
@@ -314,42 +352,38 @@ function Index() {
       </div>
 
       {/* Visualização + edição */}
-      <Dialog open={!!emEdicao} onOpenChange={(o) => !o && setAberto(null)}>
+      <Dialog open={!!emEdicao && !!rascunho} onOpenChange={(o) => !o && fechar()}>
         <DialogContent className="max-h-[92vh] max-w-[1200px] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              Certificado {emEdicao?.codigoSato} —{" "}
-              {emEdicao?.tipo === "ribbon" ? "Ribbon" : "Etiqueta"}
+              Certificado {rascunho?.codigoSato} —{" "}
+              {rascunho?.tipo === "ribbon" ? "Ribbon" : "Etiqueta"}
             </DialogTitle>
           </DialogHeader>
-          {emEdicao && (
+          {rascunho && (
             <div className="grid gap-6 lg:grid-cols-[minmax(0,380px)_1fr]">
-              <EditorCertificado
-                c={emEdicao}
-                onChange={(next) =>
-                  setCerts((prev) => prev.map((x) => (x.id === next.id ? next : x)))
-                }
-              />
+              <EditorCertificado c={rascunho} onChange={setRascunho} />
               <div className="overflow-auto rounded-md border border-border bg-muted p-4">
                 <div className="origin-top-left scale-[0.72]">
-                  <CertificadoDoc c={emEdicao} />
+                  <CertificadoDoc c={rascunho} />
                 </div>
               </div>
             </div>
           )}
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setAberto(null)}>
+            <Button variant="outline" onClick={fechar}>
               Fechar
             </Button>
-            <Button
-              disabled={busy}
-              onClick={() => emEdicao && void baixarUm(emEdicao)}
-            >
+            <Button variant="secondary" onClick={salvarEdicao}>
+              <Save /> Salvar alterações
+            </Button>
+            <Button disabled={busy} onClick={() => emEdicao && void baixarUm(emEdicao)}>
               {busy ? <Loader2 className="animate-spin" /> : <Download />} Baixar PDF
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }

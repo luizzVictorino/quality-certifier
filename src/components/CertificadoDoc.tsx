@@ -15,11 +15,12 @@ const Cabecalho = () => (
 const Rodape = ({ c }: { c: Certificado }) => (
   <div className="doc-rodape">
     <span>
-      Emitido: <strong>{c.emitidoPor}</strong>
+      {c.tipo === "ribbon" ? "Emitido:" : "Emitido por:"} {c.emitidoPor}
     </span>
     <span>Data: {c.dataEmissaoCertificado}</span>
   </div>
 );
+
 
 function Ribbon({ c }: { c: Certificado }) {
   return (
@@ -27,10 +28,18 @@ function Ribbon({ c }: { c: Certificado }) {
       <h1 className="doc-titulo">CERTIFICADO RIBBON</h1>
       <h2 className="doc-subtitulo">CERTIFICADO DE QUALIDADE</h2>
       <p className="doc-intro">
-        A <strong>SATO AUTO ID DO BRASIL</strong> concede este certificado para o produto:
+        A SATO AUTO ID DO BRASIL concede este certificado para o produto:
       </p>
 
       <table className="doc-tabela">
+        <colgroup>
+          <col style={{ width: "12%" }} />
+          <col style={{ width: "33%" }} />
+          <col style={{ width: "21%" }} />
+          <col style={{ width: "9%" }} />
+          <col style={{ width: "16%" }} />
+          <col style={{ width: "9%" }} />
+        </colgroup>
         <thead>
           <tr>
             <th>Codigo SATO</th>
@@ -41,6 +50,7 @@ function Ribbon({ c }: { c: Certificado }) {
             <th>Ent</th>
           </tr>
         </thead>
+
         <tbody>
           <tr>
             <td>{c.codigoSato}</td>
@@ -92,17 +102,16 @@ function Ribbon({ c }: { c: Certificado }) {
       </table>
 
       <p className="doc-texto">
-        <strong>
-          Condições de armazenamento que devem ser obedecidas para garantir a validade do produto:
-        </strong>{" "}
-        Umidade de 20 a 80% e Temperatura de 5 a 35°C.
+        <strong>Condições de armazenamento</strong> que devem ser obedecidas para garantir a
+        validade do produto: Umidade de 20 a 80% e Temperatura de 5 a 35°C.
       </p>
-      <p className="doc-texto">Divergências/ Substituições/ Não-conformidades:</p>
+      <p className="doc-texto">
+        <strong>Divergências/ Substituições/ Não-conformidades:</strong>
+      </p>
       <p className="doc-texto">
         <strong>NÃO CONFORMIDADE:</strong> Nenhum material deverá ser devolvido sem prévia
-        comunicação a <strong>SATO BRASIL</strong>, inclusive em casos de divergência,
-        não-conformidade ou reposição. Toda e qualquer divergência receberá a devida tratativa pela
-        SATO.
+        comunicação a SATO BRASIL, inclusive em casos de divergência, não-conformidade ou
+        reposição.Toda e qualquer divergência receberá a devida tratativa pela SATO.
       </p>
       <p className="doc-texto">
         <strong>DECLARAÇÃO:</strong> SATO AUTO ID DO BRASIL declara que o material/ item
@@ -110,6 +119,7 @@ function Ribbon({ c }: { c: Certificado }) {
         solicitados na Ordem de Compra/Contrato. Além disto, as informações prestadas estão
         acuradas, completas e são verdadeiras.
       </p>
+
     </>
   );
 }
@@ -117,44 +127,45 @@ function Ribbon({ c }: { c: Certificado }) {
 function Etiqueta({ c }: { c: Certificado }) {
   return (
     <>
-      <h1 className="doc-titulo">CERTIFICADO DE QUALIDADE</h1>
+      <h1 className="doc-titulo" style={{ marginBottom: 18 }}>
+        CERTIFICADO DE QUALIDADE
+      </h1>
 
       <table className="doc-tabela doc-tabela-dados">
         <tbody>
           <tr>
+            <th>Código SATO</th>
+            <td>{c.codigoSato}</td>
             <th>Cliente</th>
             <td>{c.cliente}</td>
-            <th>Codigo da Etiqueta</th>
-            <td>{c.codigoSato}</td>
-          </tr>
-          <tr>
-            <th>Produto</th>
-            <td>{c.modelo}</td>
-            <th>Medida</th>
-            <td>{c.medida}</td>
-          </tr>
-          <tr>
-            <th>Etiquetas x Rolo</th>
-            <td>{c.etiquetasPorRolo}</td>
-            <th>Quantidade</th>
-            <td>
-              {c.quantidadeTotal} {c.unidade}
-            </td>
           </tr>
           <tr>
             <th>Nota Fiscal</th>
             <td>{c.notaFiscal}</td>
-            <th>Pedido do Cliente</th>
-            <td>{c.pedidoCliente}</td>
+            <th>Série</th>
+            <td>{c.serie}</td>
           </tr>
           <tr>
-            <th>Pedido SATO</th>
-            <td>{c.pedidoSato}</td>
-            <th>Data da NF</th>
+            <th>Data de Emissão</th>
             <td>{c.dataEmissao}</td>
+            <th>Unidade</th>
+            <td>{c.unidade}</td>
+          </tr>
+          <tr>
+            <th>Modelo</th>
+            <td>{c.modelo}</td>
+            <th>Comprimento</th>
+            <td>{c.comprimento}</td>
+          </tr>
+          <tr>
+            <th>Largura</th>
+            <td>{c.largura}</td>
+            <th>&nbsp;</th>
+            <td>&nbsp;</td>
           </tr>
         </tbody>
       </table>
+
 
       <table className="doc-tabela">
         <thead>
