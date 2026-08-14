@@ -59,10 +59,41 @@ function Index() {
   const [erro, setErro] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [aberto, setAberto] = useState<string | null>(null);
+  const [rascunho, setRascunho] = useState<Certificado | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const docRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const emEdicao = useMemo(() => certs.find((c) => c.id === aberto) ?? null, [certs, aberto]);
+
+  const abrir = (c: Certificado) => {
+    setRascunho({ ...c, lotes: c.lotes.map((l) => ({ ...l })) });
+    setAberto(c.id);
+  };
+
+  const fechar = () => {
+    setAberto(null);
+    setRascunho(null);
+  };
+
+  const salvarEdicao = () => {
+    if (!rascunho) return;
+    setCerts((prev) => prev.map((x) => (x.id === rascunho.id ? rascunho : x)));
+    toast.success("Informações do certificado salvas.");
+    fechar();
+  };
+
+  const limpar = () => {
+    setFile(null);
+    setXmlText("");
+    setResumo(null);
+    setCerts([]);
+    setErro(null);
+    fechar();
+    docRefs.current = {};
+    if (inputRef.current) inputRef.current.value = "";
+    toast.success("Informações do XML removidas.");
+  };
+
 
   const selecionar = async (f: File) => {
     setErro(null);
