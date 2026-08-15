@@ -25,11 +25,7 @@ const Rodape = ({ c }: { c: Certificado }) => (
 function Ribbon({ c }: { c: Certificado }) {
   return (
     <>
-      <h1 className="doc-titulo">CERTIFICADO RIBBON</h1>
-      <h2 className="doc-subtitulo">CERTIFICADO DE QUALIDADE</h2>
-      <p className="doc-intro">
-        A SATO AUTO ID DO BRASIL concede este certificado para o produto:
-      </p>
+      <h1 className="doc-titulo">CERTIFICADO DE QUALIDADE</h1>
 
       <table className="doc-tabela">
         <colgroup>
@@ -127,7 +123,7 @@ function Ribbon({ c }: { c: Certificado }) {
 function Etiqueta({ c }: { c: Certificado }) {
   return (
     <>
-      <h1 className="doc-titulo" style={{ marginBottom: 18 }}>
+      <h1 className="doc-titulo" style={{ marginBottom: 30 }}>
         CERTIFICADO DE QUALIDADE
       </h1>
 
@@ -154,14 +150,8 @@ function Etiqueta({ c }: { c: Certificado }) {
           <tr>
             <th>Modelo</th>
             <td>{c.modelo}</td>
-            <th>Comprimento</th>
-            <td>{c.comprimento}</td>
-          </tr>
-          <tr>
-            <th>Largura</th>
-            <td>{c.largura}</td>
-            <th>&nbsp;</th>
-            <td>&nbsp;</td>
+            <th>Quantidade Total</th>
+            <td>{c.quantidadeTotal}</td>
           </tr>
         </tbody>
       </table>
@@ -187,7 +177,7 @@ function Etiqueta({ c }: { c: Certificado }) {
       </table>
 
       <p className="doc-texto">
-        A SATO AUTO-ID DO BRASIL, declara que o produto especificado acima esta de acordo com as
+        A <strong>SATO AUTO-ID DO BRASIL</strong>, declara que o produto especificado acima esta de acordo com as
         especificações solicitadas na Ordem de Compra, o qual foi fabricado e atende os padrões de
         qualidade e requisitos técnicos.
       </p>

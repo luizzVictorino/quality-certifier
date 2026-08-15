@@ -78,8 +78,12 @@ export const partesDescricao = (xProd: string): string[] =>
 /** Extrai as duas primeiras dimensões (110mm X 450M -> 110 / 450). */
 export const extrairDimensoes = (trecho: string) => {
   const nums = trecho.match(/(\d+(?:[.,]\d+)?)\s*(?:mm|cm|m)\b/gi) ?? [];
-  const limpar = (s?: string) => (s ? s.replace(/\s*(mm|cm|m)\b/i, "").trim() : "");
-  return { largura: limpar(nums[0]), comprimento: limpar(nums[1]) };
+
+  const limpar = (s?: string) => 
+    s ? s.replace(/\s+/g, "").trim() : "";
+  return { 
+    largura: limpar(nums[0]), 
+    comprimento: limpar(nums[1]) };
 };
 
 const extrairEtqPorRolo = (xProd: string): string => {
