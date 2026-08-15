@@ -1,5 +1,12 @@
-import type { Certificado } from "@/lib/nfe";
+import { useLayoutEffect, useRef, useState } from "react";
+import type { Certificado, Lote } from "@/lib/nfe";
 import logo from "@/assets/sato-logo.jpg";
+
+const PAGE_H = 1123;
+const PAD_TOP = 20;
+const PAD_BOTTOM = 48;
+const AVAIL = PAGE_H - PAD_TOP - PAD_BOTTOM;
+const GAP = 24; /* .doc-espaco min-height */
 
 const Cabecalho = () => (
   <div className="doc-header">
@@ -21,12 +28,12 @@ const Rodape = ({ c }: { c: Certificado }) => (
   </div>
 );
 
+/* ---------- blocos ---------- */
 
-function Ribbon({ c }: { c: Certificado }) {
+function TopoRibbon({ c }: { c: Certificado }) {
   return (
     <>
       <h1 className="doc-titulo">CERTIFICADO DE QUALIDADE</h1>
-
       <table className="doc-tabela">
         <colgroup>
           <col style={{ width: "12%" }} />
@@ -46,7 +53,6 @@ function Ribbon({ c }: { c: Certificado }) {
             <th>Ent</th>
           </tr>
         </thead>
-
         <tbody>
           <tr>
             <td>{c.codigoSato}</td>
@@ -58,28 +64,51 @@ function Ribbon({ c }: { c: Certificado }) {
           </tr>
         </tbody>
       </table>
+    </>
+  );
+}
 
-      <table className="doc-tabela">
-        <thead>
-          <tr>
-            <th>Lote Sato</th>
-            <th>Lote Fabricante</th>
-            <th>Quantidade</th>
-            <th>Unidade</th>
-          </tr>
-        </thead>
+function TopoEtiqueta({ c }: { c: Certificado }) {
+  return (
+    <>
+      <h1 className="doc-titulo" style={{ marginBottom: 30 }}>
+        CERTIFICADO DE QUALIDADE
+      </h1>
+      <table className="doc-tabela doc-tabela-dados">
         <tbody>
-          {c.lotes.map((l, i) => (
-            <tr key={i}>
-              <td>{l.nLote || (c.semLote ? "—" : "")}</td>
-              <td>{l.loteFabricante}</td>
-              <td>{l.qLote}</td>
-              <td>{c.unidade}</td>
-            </tr>
-          ))}
+          <tr>
+            <th>Código SATO</th>
+            <td>{c.codigoSato}</td>
+            <th>Cliente</th>
+            <td>{c.cliente}</td>
+          </tr>
+          <tr>
+            <th>Nota Fiscal</th>
+            <td>{c.notaFiscal}</td>
+            <th>Série</th>
+            <td>{c.serie}</td>
+          </tr>
+          <tr>
+            <th>Data de Emissão</th>
+            <td>{c.dataEmissao}</td>
+            <th>Unidade</th>
+            <td>{c.unidade}</td>
+          </tr>
+          <tr>
+            <th>Modelo</th>
+            <td>{c.modelo}</td>
+            <th>Quantidade Total</th>
+            <td>{c.quantidadeTotal}</td>
+          </tr>
         </tbody>
       </table>
+    </>
+  );
+}
 
+function BaseRibbon({ c }: { c: Certificado }) {
+  return (
+    <>
       <table className="doc-tabela">
         <thead>
           <tr>
@@ -115,71 +144,17 @@ function Ribbon({ c }: { c: Certificado }) {
         solicitados na Ordem de Compra/Contrato. Além disto, as informações prestadas estão
         acuradas, completas e são verdadeiras.
       </p>
-
     </>
   );
 }
 
-function Etiqueta({ c }: { c: Certificado }) {
+function BaseEtiqueta() {
   return (
     <>
-      <h1 className="doc-titulo" style={{ marginBottom: 30 }}>
-        CERTIFICADO DE QUALIDADE
-      </h1>
-
-      <table className="doc-tabela doc-tabela-dados">
-        <tbody>
-          <tr>
-            <th>Código SATO</th>
-            <td>{c.codigoSato}</td>
-            <th>Cliente</th>
-            <td>{c.cliente}</td>
-          </tr>
-          <tr>
-            <th>Nota Fiscal</th>
-            <td>{c.notaFiscal}</td>
-            <th>Série</th>
-            <td>{c.serie}</td>
-          </tr>
-          <tr>
-            <th>Data de Emissão</th>
-            <td>{c.dataEmissao}</td>
-            <th>Unidade</th>
-            <td>{c.unidade}</td>
-          </tr>
-          <tr>
-            <th>Modelo</th>
-            <td>{c.modelo}</td>
-            <th>Quantidade Total</th>
-            <td>{c.quantidadeTotal}</td>
-          </tr>
-        </tbody>
-      </table>
-
-
-      <table className="doc-tabela">
-        <thead>
-          <tr>
-            <th>Lote</th>
-            <th>Quantidade</th>
-            <th>Unidade</th>
-          </tr>
-        </thead>
-        <tbody>
-          {c.lotes.map((l, i) => (
-            <tr key={i}>
-              <td>{l.nLote || (c.semLote ? "—" : "")}</td>
-              <td>{l.qLote}</td>
-              <td>{c.unidade}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
       <p className="doc-texto">
-        A <strong>SATO AUTO-ID DO BRASIL</strong>, declara que o produto especificado acima esta de acordo com as
-        especificações solicitadas na Ordem de Compra, o qual foi fabricado e atende os padrões de
-        qualidade e requisitos técnicos.
+        A <strong>SATO AUTO-ID DO BRASIL</strong>, declara que o produto especificado acima esta de
+        acordo com as especificações solicitadas na Ordem de Compra, o qual foi fabricado e atende
+        os padrões de qualidade e requisitos técnicos.
       </p>
       <p className="doc-texto">
         Em caso de divergência, alteração e/ou não-conformidade, não enviar nenhum material ou
@@ -196,13 +171,150 @@ function Etiqueta({ c }: { c: Certificado }) {
   );
 }
 
-export function CertificadoDoc({ c, innerRef }: { c: Certificado; innerRef?: (el: HTMLDivElement | null) => void }) {
+function TabelaLotes({
+  c,
+  lotes,
+  headRef,
+  rowRef,
+}: {
+  c: Certificado;
+  lotes: Lote[];
+  headRef?: (el: HTMLTableSectionElement | null) => void;
+  rowRef?: (el: HTMLTableRowElement | null) => void;
+}) {
+  const ribbon = c.tipo === "ribbon";
   return (
-    <div className="doc-page" ref={innerRef}>
-      <Cabecalho />
-      {c.tipo === "ribbon" ? <Ribbon c={c} /> : <Etiqueta c={c} />}
-      <div className="doc-espaco" />
-      <Rodape c={c} />
+    <table className="doc-tabela">
+      <thead ref={headRef}>
+        <tr>
+          <th>{ribbon ? "Lote Sato" : "Lote"}</th>
+          {ribbon && <th>Lote Fabricante</th>}
+          <th>Quantidade</th>
+          <th>Unidade</th>
+        </tr>
+      </thead>
+      <tbody>
+        {lotes.map((l, i) => (
+          <tr key={i} ref={i === 0 ? rowRef : undefined}>
+            <td>{l.nLote || (c.semLote ? "—" : "")}</td>
+            {ribbon && <td>{l.loteFabricante}</td>}
+            <td>{l.qLote}</td>
+            <td>{c.unidade}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+/* ---------- documento paginado ---------- */
+
+type Medidas = {
+  header: number;
+  topo: number;
+  base: number;
+  loteHead: number;
+  row: number;
+  rodape: number;
+};
+
+export function CertificadoDoc({
+  c,
+  innerRef,
+}: {
+  c: Certificado;
+  innerRef?: (el: HTMLDivElement | null) => void;
+}) {
+  const [medidas, setMedidas] = useState<Medidas | null>(null);
+  const refs = useRef<Record<string, HTMLElement | null>>({});
+
+  const probeKey = `${c.tipo}|${c.lotes.length}|${c.cliente}|${c.modelo}|${c.codigoSato}`;
+
+  useLayoutEffect(() => {
+    setMedidas(null);
+  }, [probeKey]);
+
+  useLayoutEffect(() => {
+    if (medidas) return;
+    const h = (k: string) => refs.current[k]?.getBoundingClientRect().height ?? 0;
+    const row = h("row");
+    if (!row) return;
+    setMedidas({
+      header: h("header"),
+      topo: h("topo"),
+      base: h("base"),
+      loteHead: h("loteHead"),
+      row,
+      rodape: h("rodape"),
+    });
+  });
+
+  const Topo = c.tipo === "ribbon" ? <TopoRibbon c={c} /> : <TopoEtiqueta c={c} />;
+  const Base = c.tipo === "ribbon" ? <BaseRibbon c={c} /> : <BaseEtiqueta />;
+
+  if (!medidas) {
+    /* passo de medição — mesma estrutura, uma linha de lote */
+    return (
+      <div ref={innerRef}>
+        <div className="doc-page">
+          <div ref={(el) => (refs.current["header"] = el)}>
+            <Cabecalho />
+          </div>
+          <div ref={(el) => (refs.current["topo"] = el)}>{Topo}</div>
+          <TabelaLotes
+            c={c}
+            lotes={c.lotes.length ? [c.lotes[0]!] : [{ nLote: "1", qLote: "1", loteFabricante: "1" }]}
+            headRef={(el) => (refs.current["loteHead"] = el)}
+            rowRef={(el) => (refs.current["row"] = el)}
+          />
+          <div ref={(el) => (refs.current["base"] = el)}>{Base}</div>
+          <div className="doc-espaco" />
+          <div ref={(el) => (refs.current["rodape"] = el)}>
+            <Rodape c={c} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const capPrimeira = AVAIL - medidas.header - medidas.topo - medidas.loteHead - medidas.rodape - GAP;
+  const capOutras = AVAIL - medidas.header - medidas.loteHead - medidas.rodape - GAP;
+
+  const grupos: Lote[][] = [];
+  let i = 0;
+  const lotes = c.lotes.length ? c.lotes : [];
+  while (i < lotes.length) {
+    const cap = grupos.length === 0 ? capPrimeira : capOutras;
+    const n = Math.max(1, Math.floor(cap / medidas.row));
+    grupos.push(lotes.slice(i, i + n));
+    i += n;
+  }
+  if (grupos.length === 0) grupos.push([]);
+
+  const capUltima = grupos.length === 1 ? capPrimeira : capOutras;
+  const usado = (grupos[grupos.length - 1]?.length ?? 0) * medidas.row;
+  const basePaginaNova = capUltima - usado < medidas.base;
+
+  return (
+    <div ref={innerRef}>
+      {grupos.map((grupo, idx) => (
+        <div className="doc-page" key={idx}>
+          <Cabecalho />
+          {idx === 0 && Topo}
+          <TabelaLotes c={c} lotes={grupo} />
+          {idx === grupos.length - 1 && !basePaginaNova && Base}
+          <div className="doc-espaco" />
+          <Rodape c={c} />
+        </div>
+      ))}
+      {basePaginaNova && (
+        <div className="doc-page">
+          <Cabecalho />
+          {Base}
+          <div className="doc-espaco" />
+          <Rodape c={c} />
+        </div>
+      )}
     </div>
   );
 }
