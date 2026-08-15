@@ -305,7 +305,7 @@ function Index() {
                         {c.semLote ? (
                           <span className="text-muted-foreground">Sem lote informado</span>
                         ) : (
-                          c.lotes.map((l) => <div key={l.nLote}>{l.nLote}</div>)
+                          c.lotes.map((l, i) => <div key={i}>{l.nLote}</div>)
                         )}
                       </TableCell>
                       <TableCell className="text-xs">
