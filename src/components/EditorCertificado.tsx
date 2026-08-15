@@ -1,6 +1,9 @@
+import { Plus, Trash2 } from "lucide-react";
 import type { Certificado, Lote } from "@/lib/nfe";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 
 type Props = {
   c: Certificado;
@@ -30,6 +33,16 @@ export function EditorCertificado({ c, onChange }: Props) {
     const lotes = c.lotes.map((l, idx) => (idx === i ? { ...l, ...patch } : l));
     onChange({ ...c, lotes });
   };
+  const addLote = () =>
+    onChange({
+      ...c,
+      semLote: false,
+      lotes: [...c.lotes, { nLote: "", qLote: "", loteFabricante: "" }],
+    });
+  const removeLote = (i: number) =>
+    onChange({ ...c, lotes: c.lotes.filter((_, idx) => idx !== i) });
+
+
 
   return (
     <div className="space-y-5">
@@ -72,30 +85,52 @@ export function EditorCertificado({ c, onChange }: Props) {
       </div>
 
       <div className="space-y-2">
-        <h4 className="text-sm font-semibold">
-          Lotes {c.semLote && <span className="text-muted-foreground">(item sem rastro no XML)</span>}
-        </h4>
+        <div className="flex items-center justify-between">
+          <h4 className="text-sm font-semibold">
+            Lotes{" "}
+            {c.semLote && <span className="text-muted-foreground">(item sem rastro no XML)</span>}
+          </h4>
+          <Button type="button" size="sm" variant="outline" onClick={addLote}>
+            <Plus /> Adicionar Lote
+          </Button>
+        </div>
         {c.lotes.map((l, i) => (
-          <div
-            key={i}
-            className={`grid gap-3 rounded-md border border-border bg-secondary/40 p-3 ${c.tipo === "ribbon" ? "grid-cols-3" : "grid-cols-2"}`}
-          >
-            <Campo label="Lote SATO" value={l.nLote} onChange={(v) => setLote(i, { nLote: v })} />
-            {c.tipo === "ribbon" && (
+          <div key={i} className="rounded-md border border-border bg-secondary/40 p-3">
+            <div
+              className={`grid gap-3 ${c.tipo === "ribbon" ? "grid-cols-3" : "grid-cols-2"}`}
+            >
+              <Campo label="Lote SATO" value={l.nLote} onChange={(v) => setLote(i, { nLote: v })} />
+              {c.tipo === "ribbon" && (
+                <Campo
+                  label="Lote Fabricante"
+                  value={l.loteFabricante}
+                  onChange={(v) => setLote(i, { loteFabricante: v })}
+                />
+              )}
               <Campo
-                label="Lote Fabricante"
-                value={l.loteFabricante}
-                onChange={(v) => setLote(i, { loteFabricante: v })}
+                label="Quantidade"
+                value={l.qLote}
+                onChange={(v) => setLote(i, { qLote: v })}
               />
-            )}
-            <Campo
-              label="Quantidade"
-              value={l.qLote}
-              onChange={(v) => setLote(i, { qLote: v })}
-            />
+            </div>
+            <div className="mt-2 flex justify-end">
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="text-destructive hover:text-destructive"
+                onClick={() => removeLote(i)}
+              >
+                <Trash2 /> Remover
+              </Button>
+            </div>
           </div>
         ))}
+        {c.lotes.length === 0 && (
+          <p className="text-xs text-muted-foreground">Nenhum lote. Adicione um lote manualmente.</p>
+        )}
       </div>
+
     </div>
   );
 }
