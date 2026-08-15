@@ -257,19 +257,19 @@ export function CertificadoDoc({
     return (
       <div ref={innerRef}>
         <div className="doc-page">
-          <div ref={(el) => (refs.current["header"] = el)}>
+          <div ref={(el) => { refs.current["header"] = el; }}>
             <Cabecalho />
           </div>
-          <div ref={(el) => (refs.current["topo"] = el)}>{Topo}</div>
+          <div ref={(el) => { refs.current["topo"] = el; }}>{Topo}</div>
           <TabelaLotes
             c={c}
             lotes={c.lotes.length ? [c.lotes[0]!] : [{ nLote: "1", qLote: "1", loteFabricante: "1" }]}
-            headRef={(el) => (refs.current["loteHead"] = el)}
-            rowRef={(el) => (refs.current["row"] = el)}
+            headRef={(el) => { refs.current["loteHead"] = el; }}
+            rowRef={(el) => { refs.current["row"] = el; }}
           />
-          <div ref={(el) => (refs.current["base"] = el)}>{Base}</div>
+          <div ref={(el) => { refs.current["base"] = el; }}>{Base}</div>
           <div className="doc-espaco" />
-          <div ref={(el) => (refs.current["rodape"] = el)}>
+          <div ref={(el) => { refs.current["rodape"] = el; }}>
             <Rodape c={c} />
           </div>
         </div>
