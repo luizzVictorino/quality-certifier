@@ -33,6 +33,16 @@ export function EditorCertificado({ c, onChange }: Props) {
     const lotes = c.lotes.map((l, idx) => (idx === i ? { ...l, ...patch } : l));
     onChange({ ...c, lotes });
   };
+  const addLote = () =>
+    onChange({
+      ...c,
+      semLote: false,
+      lotes: [...c.lotes, { nLote: "", qLote: "", loteFabricante: "" }],
+    });
+  const removeLote = (i: number) =>
+    onChange({ ...c, lotes: c.lotes.filter((_, idx) => idx !== i) });
+
+
 
   return (
     <div className="space-y-5">
