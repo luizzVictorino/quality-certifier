@@ -198,14 +198,14 @@
 }
 .doc-tabela-dados th { background: hsl(195, 93%, 94%); width: 17%; }
 .doc-tabela-dados td { width: 33%; }
-.doc-texto { margin: 10px 0 12px; text-align: left; font-size: 12px; line-height: 1.6; }
+.doc-texto { margin: 10px 0 12px; text-align: left; font-size: 12px; line-height: 1.5; }
 .doc-espaco { flex: 1 1 auto; min-height: 24px; }
 .doc-rodape {
   display: flex;
   justify-content: space-between;
   border-top: 1px solid #97bbeb;
   padding-top: 10px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
 }
 

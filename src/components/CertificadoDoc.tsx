@@ -36,21 +36,21 @@ function TopoRibbon({ c }: { c: Certificado }) {
       <h1 className="doc-titulo">CERTIFICADO DE QUALIDADE</h1>
       <table className="doc-tabela">
         <colgroup>
-          <col style={{ width: "12%" }} />
+          <col style={{ width: "14%" }} />
           <col style={{ width: "33%" }} />
           <col style={{ width: "21%" }} />
           <col style={{ width: "9%" }} />
-          <col style={{ width: "16%" }} />
+          <col style={{ width: "14%" }} />
           <col style={{ width: "9%" }} />
         </colgroup>
         <thead>
           <tr>
             <th>Codigo SATO</th>
             <th>Cliente</th>
-            <th>Modelo</th>
+            <th>Modelo Ribbon</th>
             <th>Largura</th>
             <th>Comprimento</th>
-            <th>Ent</th>
+            <th>Ent.</th>
           </tr>
         </thead>
         <tbody>
@@ -60,7 +60,7 @@ function TopoRibbon({ c }: { c: Certificado }) {
             <td>{c.modelo}</td>
             <td>{c.largura}</td>
             <td>{c.comprimento}</td>
-            <td>{c.entrega}</td>
+            <td>{c.entintamento}</td>
           </tr>
         </tbody>
       </table>

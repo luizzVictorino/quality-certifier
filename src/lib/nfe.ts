@@ -25,7 +25,7 @@ export type Certificado = {
   dataEmissao: string;
   pedidoCliente: string;
   pedidoSato: string;
-  entrega: string;
+  entintamento: string;
   emitidoPor: string;
   dataEmissaoCertificado: string;
   lotes: Lote[];
@@ -173,7 +173,7 @@ export function parseNFe(xmlText: string): { resumo: NFeResumo; certificados: Ce
       dataEmissao,
       pedidoCliente: txt(prod, "xPed") ?? "",
       pedidoSato: "",
-      entrega: "EXT",
+      entintamento: "",
       emitidoPor: "Depto. da Qualidade",
       dataEmissaoCertificado: dataHoje,
       lotes:
