@@ -1,0 +1,32 @@
+appId: com.sato.certificadoqualidade
+productName: CertificadoQualidade
+copyright: Certificado de Qualidade
+directories:
+  output: /tmp/dist-desktop
+  buildResources: build
+files:
+  - electron/**
+  - desktop/dist-web/**
+  - package.json
+  - '!node_modules/**'
+extraMetadata:
+  main: electron/main.cjs
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  artifactName: CertificadoQualidade-${version}-${arch}.${ext}
+  icon: build/icon.ico
+portable:
+  artifactName: CertificadoQualidade.exe
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Certificado de Qualidade
+  artifactName: CertificadoQualidade-Setup.exe
+  uninstallDisplayName: Certificado de Qualidade

@@ -1,0 +1,163 @@
+const { app, BrowserWindow, shell, session, dialog } = require("electron");
+const path = require("node:path");
+const fs = require("node:fs");
+const os = require("node:os");
+
+const APP_NAME = "Certificado de Qualidade";
+const isDev = !app.isPackaged && process.env.CQ_DEV === "1";
+
+// ---------------------------------------------------------------------------
+// Logs em %LOCALAPPDATA%\CertificadoQualidade\logs
+// ---------------------------------------------------------------------------
+const logDir = path.join(app.getPath("appData"), "CertificadoQualidade", "logs");
+function log(msg) {
+  try {
+    fs.mkdirSync(logDir, { recursive: true });
+    fs.appendFileSync(
+      path.join(logDir, "app.log"),
+      `[${new Date().toISOString()}] ${msg}${os.EOL}`,
+    );
+  } catch {
+    /* logging nunca deve derrubar o app */
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Instância única
+// ---------------------------------------------------------------------------
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+  process.exit(0);
+}
+
+let mainWindow = null;
+
+app.on("second-instance", () => {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.show();
+    mainWindow.focus();
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Janela
+// ---------------------------------------------------------------------------
+const indexPath = path.join(__dirname, "..", "desktop", "dist-web", "index.html");
+const appDir = path.dirname(indexPath);
+
+function isInternalUrl(url) {
+  if (!url) return false;
+  if (!url.startsWith("file://")) return false;
+  try {
+    const target = path.resolve(decodeURIComponent(new URL(url).pathname));
+    return target.startsWith(path.resolve(appDir));
+  } catch {
+    return false;
+  }
+}
+
+function createWindow() {
+  if (!fs.existsSync(indexPath)) {
+    dialog.showErrorBox(
+      APP_NAME,
+      "Arquivos da aplicação não encontrados. Reinstale o Certificado de Qualidade.",
+    );
+    app.quit();
+    return;
+  }
+
+  mainWindow = new BrowserWindow({
+    title: APP_NAME,
+    width: 1440,
+    height: 900,
+    minWidth: 1024,
+    minHeight: 700,
+    show: false,
+    autoHideMenuBar: true,
+    icon: path.join(__dirname, "icon.png"),
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+      devTools: isDev,
+      webviewTag: false,
+      spellcheck: false,
+    },
+  });
+
+  mainWindow.setMenuBarVisibility(false);
+  if (!isDev) mainWindow.removeMenu();
+
+  // Nunca abrir novas janelas/abas/navegador externo.
+  mainWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+
+  // Bloquear qualquer navegação para fora dos arquivos empacotados.
+  mainWindow.webContents.on("will-navigate", (event, url) => {
+    if (!isInternalUrl(url)) {
+      event.preventDefault();
+      log(`navegação bloqueada: ${url}`);
+    }
+  });
+  mainWindow.webContents.on("will-redirect", (event, url) => {
+    if (!isInternalUrl(url)) event.preventDefault();
+  });
+
+  // Sem DevTools em produção.
+  mainWindow.webContents.on("before-input-event", (event, input) => {
+    if (isDev) return;
+    const key = (input.key || "").toLowerCase();
+    const blocked =
+      key === "f12" ||
+      (input.control && input.shift && ["i", "j", "c"].includes(key)) ||
+      (input.control && ["r", "u", "+", "-"].includes(key));
+    if (blocked) event.preventDefault();
+  });
+  mainWindow.webContents.on("devtools-opened", () => {
+    if (!isDev) mainWindow.webContents.closeDevTools();
+  });
+
+  mainWindow.once("ready-to-show", () => mainWindow.show());
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+  });
+
+  mainWindow.loadFile(indexPath);
+}
+
+app.whenReady().then(() => {
+  // Nenhuma permissão de dispositivo/rede é necessária.
+  session.defaultSession.setPermissionRequestHandler((_wc, _perm, cb) => cb(false));
+
+  // Bloqueia qualquer requisição de rede externa (app é 100% local).
+  session.defaultSession.webRequest.onBeforeRequest((details, callback) => {
+    const url = details.url;
+    const allowed =
+      url.startsWith("file://") || url.startsWith("data:") || url.startsWith("blob:");
+    if (!allowed) log(`requisição externa bloqueada: ${url}`);
+    callback({ cancel: !allowed });
+  });
+
+  createWindow();
+});
+
+// Encerramento completo: fechar a janela finaliza o processo em qualquer SO.
+app.on("window-all-closed", () => {
+  app.quit();
+});
+
+function shutdown() {
+  try {
+    for (const win of BrowserWindow.getAllWindows()) win.destroy();
+  } catch {
+    /* ignore */
+  }
+  app.quit();
+}
+
+app.on("before-quit", () => log("encerrando aplicação"));
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
+process.on("uncaughtException", (err) => {
+  log(`erro não tratado: ${err && err.stack ? err.stack : err}`);
+});
