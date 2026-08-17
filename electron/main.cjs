@@ -1,4 +1,5 @@
-const { app, BrowserWindow, shell, session, dialog } = require("electron");
+const { app, BrowserWindow, protocol, net, session, dialog } = require("electron");
+const { pathToFileURL } = require("node:url");
 const path = require("node:path");
 const fs = require("node:fs");
 const os = require("node:os");
@@ -46,15 +47,24 @@ app.on("second-instance", () => {
 const indexPath = path.join(__dirname, "..", "desktop", "dist-web", "index.html");
 const appDir = path.dirname(indexPath);
 
+// Servido por um protocolo interno (app://) porque módulos ES não carregam via file://.
+const APP_ORIGIN = "app://certificado";
+
 function isInternalUrl(url) {
-  if (!url) return false;
-  if (!url.startsWith("file://")) return false;
-  try {
-    const target = path.resolve(decodeURIComponent(new URL(url).pathname));
-    return target.startsWith(path.resolve(appDir));
-  } catch {
-    return false;
-  }
+  return typeof url === "string" && url.startsWith(APP_ORIGIN);
+}
+
+function registerAppProtocol() {
+  protocol.handle("app", (request) => {
+    const { host, pathname } = new URL(request.url);
+    if (host !== "certificado") return new Response("Bloqueado", { status: 403 });
+    const rel = decodeURIComponent(pathname === "/" ? "/index.html" : pathname);
+    const target = path.join(appDir, path.normalize(rel));
+    if (!target.startsWith(path.resolve(appDir))) {
+      return new Response("Bloqueado", { status: 403 });
+    }
+    return net.fetch(pathToFileURL(target).toString());
+  });
 }
 
 function createWindow() {
@@ -122,10 +132,15 @@ function createWindow() {
     mainWindow = null;
   });
 
-  mainWindow.loadFile(indexPath);
+  mainWindow.loadURL(`${APP_ORIGIN}/index.html`);
 }
 
+protocol.registerSchemesAsPrivileged([
+  { scheme: "app", privileges: { standard: true, secure: true, supportFetchAPI: true } },
+]);
+
 app.whenReady().then(() => {
+  registerAppProtocol();
   // Nenhuma permissão de dispositivo/rede é necessária.
   session.defaultSession.setPermissionRequestHandler((_wc, _perm, cb) => cb(false));
 
@@ -133,7 +148,7 @@ app.whenReady().then(() => {
   session.defaultSession.webRequest.onBeforeRequest((details, callback) => {
     const url = details.url;
     const allowed =
-      url.startsWith("file://") || url.startsWith("data:") || url.startsWith("blob:");
+      url.startsWith(APP_ORIGIN) || url.startsWith("data:") || url.startsWith("blob:");
     if (!allowed) log(`requisição externa bloqueada: ${url}`);
     callback({ cancel: !allowed });
   });
