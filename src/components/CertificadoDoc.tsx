@@ -109,7 +109,7 @@ function TopoEtiqueta({ c }: { c: Certificado }) {
 function BaseRibbon({ c }: { c: Certificado }) {
   return (
     <>
-      <table className="doc-tabela">
+      <table className="doc-tabela .doc-tabela2">
         <thead>
           <tr>
             <th>NOTA FISCAL</th>
@@ -184,7 +184,7 @@ function TabelaLotes({
 }) {
   const ribbon = c.tipo === "ribbon";
   return (
-    <table className="doc-tabela">
+    <table className="doc-tabela .doc-tabela2">
       <thead ref={headRef}>
         <tr>
           <th>{ribbon ? "Lote Sato" : "Lote"}</th>
