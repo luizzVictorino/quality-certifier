@@ -176,10 +176,14 @@ export function parseNFe(xmlText: string): { resumo: NFeResumo; certificados: Ce
       entintamento: "",
       emitidoPor: "Depto. da Qualidade",
       dataEmissaoCertificado: dataHoje,
-      lotes:
+/*       lotes:
         lotes.length > 0
           ? lotes
           : [{ nLote: "", qLote: formatarQuantidade(qtdTotal), loteFabricante: "" }],
+      semLote: lotes.length === 0, */
+
+      /*Alteração*/
+      lotes,
       semLote: lotes.length === 0,
     };
   });
