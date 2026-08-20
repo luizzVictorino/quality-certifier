@@ -75,12 +75,51 @@ function Index() {
     setRascunho(null);
   };
 
-  const salvarEdicao = () => {
+/*   const salvarEdicao = () => {
     if (!rascunho) return;
     setCerts((prev) => prev.map((x) => (x.id === rascunho.id ? rascunho : x)));
     toast.success("Informações do certificado salvas.");
     fechar();
+  }; */
+
+  const formatarQuantidadeLote = (valor: string) => {
+  if (!valor.trim()) return "";
+
+  const numero = Number(
+    valor.replace(/\./g, "").replace(",", ".")
+  );
+
+  if (Number.isNaN(numero)) return valor;
+
+  return numero.toFixed(3).replace(".", ",");
+};
+
+const salvarEdicao = () => {
+  if (!rascunho) return;
+
+  const certificadoAtualizado: Certificado = {
+    ...rascunho,
+    lotes: rascunho.lotes.map((lote) => ({
+      ...lote,
+      qLote: formatarQuantidadeLote(lote.qLote),
+    })),
   };
+
+  setCerts((prev) =>
+    prev.map((x) =>
+      x.id === certificadoAtualizado.id
+        ? certificadoAtualizado
+        : x
+    )
+  );
+
+  toast.success("Informações do certificado salvas.");
+
+  fechar();
+};
+
+
+  /*----------------------------------------------------------------------------*/
 
   const limpar = () => {
     setFile(null);
