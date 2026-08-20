@@ -301,7 +301,7 @@ function Index() {
                           {c.tipo === "ribbon" ? "Ribbon" : "Etiqueta"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs">
+                    {/*   <TableCell className="text-xs">
                         {c.semLote ? (
                           <span className="text-muted-foreground">Sem lote informado</span>
                         ) : (
@@ -311,7 +311,33 @@ function Index() {
                       <TableCell className="text-xs">
                         {c.lotes.map((l, i) => (
                           <div key={i}>{l.qLote}</div>
-                        ))}
+                        ))} */}
+
+
+                      <TableCell className="text-xs">
+                        {c.lotes.length === 0 ? (
+                          <span className="text-muted-foreground">
+                            Sem lote informado
+                          </span>
+                        ) : (
+                          c.lotes
+                            .filter((l) => l.nLote.trim() !== "")
+                            .map((l, i) => <div key={i}>{l.nLote}</div>)
+                        )}
+                      </TableCell>
+                      
+                      <TableCell className="text-xs">
+                        {c.lotes.length === 0 ? (
+                          <span>{c.quantidadeTotal}</span>
+                        ) : (
+                          c.lotes
+                            .filter((l) => l.nLote.trim() !== "")
+                            .map((l, i) => <div key={i}>{l.qLote}</div>)
+                        )}
+                      </TableCell>
+
+
+                      { /*----------------------*/}
                       </TableCell>
                       <TableCell>{c.unidade}</TableCell>
                       <TableCell className="text-right">
