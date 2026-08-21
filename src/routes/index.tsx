@@ -430,7 +430,7 @@ const salvarEdicao = () => {
               <EditorCertificado c={rascunho} onChange={setRascunho} />
               <div className="overflow-auto rounded-md border border-border bg-muted p-4">
                 <div className="origin-top-left scale-[0.72]">
-                  <CertificadoDoc c={rascunho} />
+                  {null && <CertificadoDoc c={rascunho} />}
                 </div>
               </div>
             </div>
