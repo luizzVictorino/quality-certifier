@@ -227,18 +227,16 @@ export function CertificadoDoc({
 }) {
   const [medidas, setMedidas] = useState<Medidas | null>(null);
   const refs = useRef<Record<string, HTMLElement | null>>({});
+  const medidoPara = useRef<string | null>(null);
 
-  const probeKey = `${c.tipo}|${c.lotes.length}|${c.cliente}|${c.modelo}|${c.codigoSato}`;
-
-  useLayoutEffect(() => {
-    setMedidas(null);
-  }, [probeKey]);
+  const probeKey = `${c.tipo}|${c.cliente}|${c.modelo}|${c.codigoSato}`;
 
   useLayoutEffect(() => {
-    if (medidas) return;
+    if (medidoPara.current === probeKey) return;
     const h = (k: string) => refs.current[k]?.getBoundingClientRect().height ?? 0;
     const row = h("row");
     if (!row) return;
+    medidoPara.current = probeKey;
     setMedidas({
       header: h("header"),
       topo: h("topo"),
@@ -247,7 +245,8 @@ export function CertificadoDoc({
       row,
       rodape: h("rodape"),
     });
-  });
+  }, [probeKey]);
+
 
   const Topo = c.tipo === "ribbon" ? <TopoRibbon c={c} /> : <TopoEtiqueta c={c} />;
   const Base = c.tipo === "ribbon" ? <BaseRibbon c={c} /> : <BaseEtiqueta />;
