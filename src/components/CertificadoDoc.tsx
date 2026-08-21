@@ -226,7 +226,7 @@ export function CertificadoDoc({
   innerRef?: (el: HTMLDivElement | null) => void;
 }) {
   const [medidas, setMedidas] = useState<Medidas | null>(null);
-  (window as any).__r = ((window as any).__r||0)+1; if ((window as any).__r % 50 === 0) console.log("RENDER", (window as any).__r, JSON.stringify(medidas));
+  const w = window as any; w.__r=(w.__r||0)+1; w.__log=w.__log||[]; if(w.__log.length<40) w.__log.push(c.id+"|"+JSON.stringify(medidas));
   const refs = useRef<Record<string, HTMLElement | null>>({});
 
   const probeKey = `${c.tipo}|${c.lotes.length}|${c.cliente}|${c.modelo}|${c.codigoSato}`;
