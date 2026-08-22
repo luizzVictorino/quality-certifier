@@ -405,7 +405,7 @@ const salvarEdicao = () => {
 
       {/* Documentos renderizados fora da tela — fonte para os PDFs */}
       <div className="pointer-events-none fixed -left-[10000px] top-0" aria-hidden>
-        {certs.map((c) => (
+        {false && certs.map((c) => (
           <CertificadoDoc
             key={c.id}
             c={c}
@@ -416,9 +416,13 @@ const salvarEdicao = () => {
         ))}
       </div>
 
+
       {/* Visualização + edição */}
       <Dialog open={!!emEdicao && !!rascunho} onOpenChange={(o) => !o && fechar()}>
-        <DialogContent className="max-h-[92vh] max-w-[1200px] overflow-y-auto">
+        <DialogContent
+          className="max-h-[92vh] max-w-[1200px] overflow-y-auto"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle>
               Certificado {rascunho?.codigoSato} —{" "}
@@ -427,7 +431,7 @@ const salvarEdicao = () => {
           </DialogHeader>
           {rascunho && (
             <div className="grid gap-6 lg:grid-cols-[minmax(0,380px)_1fr]">
-              <EditorCertificado c={rascunho} onChange={setRascunho} />
+              {null && <EditorCertificado c={rascunho} onChange={setRascunho} />}
               <div className="overflow-auto rounded-md border border-border bg-muted p-4">
                 <div className="origin-top-left scale-[0.72]">
                   {null && <CertificadoDoc c={rascunho} />}

@@ -1,6 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
 import { RouterProvider, createHashHistory, createRouter } from "@tanstack/react-router";
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { routeTree } from "@/routeTree.gen";
@@ -23,7 +22,5 @@ declare module "@tanstack/react-router" {
 }
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
+  <RouterProvider router={router} />,
 );
