@@ -24,7 +24,15 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { CertificadoDoc } from "@/components/CertificadoDoc";
 import { EditorCertificado } from "@/components/EditorCertificado";
-import { parseNFe, nomeArquivo, NFeError, type Certificado, type NFeResumo } from "@/lib/nfe";
+import {
+  parseNFe,
+  nomeArquivo,
+  NFeError,
+  validarCertificado,
+  isCertificadoValido,
+  type Certificado,
+  type NFeResumo,
+} from "@/lib/nfe";
 import { elementToPdfBlob, elementsToSinglePdfBlob, downloadBlob } from "@/lib/pdf";
 
 export const Route = createFileRoute("/")({
