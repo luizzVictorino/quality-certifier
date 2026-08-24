@@ -405,7 +405,7 @@ const salvarEdicao = () => {
 
       {/* Documentos renderizados fora da tela — fonte para os PDFs */}
       <div className="pointer-events-none fixed -left-[10000px] top-0" aria-hidden>
-        {false && certs.map((c) => (
+        {certs.map((c) => (
           <CertificadoDoc
             key={c.id}
             c={c}
@@ -415,7 +415,6 @@ const salvarEdicao = () => {
           />
         ))}
       </div>
-
 
       {/* Visualização + edição */}
       <Dialog open={!!emEdicao && !!rascunho} onOpenChange={(o) => !o && fechar()}>
@@ -431,14 +430,15 @@ const salvarEdicao = () => {
           </DialogHeader>
           {rascunho && (
             <div className="grid gap-6 lg:grid-cols-[minmax(0,380px)_1fr]">
-              {null && <EditorCertificado c={rascunho} onChange={setRascunho} />}
+              <EditorCertificado c={rascunho} onChange={setRascunho} />
               <div className="overflow-auto rounded-md border border-border bg-muted p-4">
                 <div className="origin-top-left scale-[0.72]">
-                  {null && <CertificadoDoc c={rascunho} />}
+                  <CertificadoDoc c={rascunho} />
                 </div>
               </div>
             </div>
           )}
+
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={fechar}>
               Fechar
