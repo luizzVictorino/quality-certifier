@@ -24,7 +24,15 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { CertificadoDoc } from "@/components/CertificadoDoc";
 import { EditorCertificado } from "@/components/EditorCertificado";
-import { parseNFe, nomeArquivo, NFeError, type Certificado, type NFeResumo } from "@/lib/nfe";
+import {
+  parseNFe,
+  nomeArquivo,
+  NFeError,
+  validarCertificado,
+  isCertificadoValido,
+  type Certificado,
+  type NFeResumo,
+} from "@/lib/nfe";
 import { elementToPdfBlob, elementsToSinglePdfBlob, downloadBlob } from "@/lib/pdf";
 
 export const Route = createFileRoute("/")({
@@ -64,6 +72,20 @@ function Index() {
   const docRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const emEdicao = useMemo(() => certs.find((c) => c.id === aberto) ?? null, [certs, aberto]);
+
+  const validacoes = useMemo(
+    () => new Map(certs.map((c) => [c.id, validarCertificado(c)] as const)),
+    [certs],
+  );
+  const incompletos = useMemo(
+    () => certs.filter((c) => !validacoes.get(c.id)?.valido),
+    [certs, validacoes],
+  );
+  const todosValidos = certs.length > 0 && incompletos.length === 0;
+  const validacaoRascunho = useMemo(
+    () => (rascunho ? validarCertificado(rascunho) : null),
+    [rascunho],
+  );
 
   const abrir = (c: Certificado) => {
     setRascunho({ ...c, lotes: c.lotes.map((l) => ({ ...l })) });
@@ -168,7 +190,30 @@ const salvarEdicao = () => {
     }
   };
 
+  const bloquearSeIncompleto = (c: Certificado) => {
+    const v = validarCertificado(c);
+    if (!v.valido) {
+      toast.error(
+        `Item ${c.nItem} (${c.codigoSato}) incompleto. Preencha: ${v.pendencias.join(", ")}.`,
+      );
+      return true;
+    }
+    return false;
+  };
+
+  const bloquearSeAlgumIncompleto = () => {
+    const invalidos = certs.filter((c) => !isCertificadoValido(c));
+    if (certs.length === 0 || invalidos.length > 0) {
+      toast.error(
+        "Existem itens com informações obrigatórias pendentes. Preencha todos os campos obrigatórios para gerar o PDF único ou baixar todos os certificados em ZIP.",
+      );
+      return true;
+    }
+    return false;
+  };
+
   const baixarUm = async (c: Certificado) => {
+    if (bloquearSeIncompleto(c)) return;
     const el = docRefs.current[c.id];
     if (!el) return;
     setBusy(true);
@@ -180,6 +225,7 @@ const salvarEdicao = () => {
   };
 
   const baixarZip = async () => {
+    if (bloquearSeAlgumIncompleto()) return;
     setBusy(true);
     try {
       const zip = new JSZip();
@@ -197,6 +243,7 @@ const salvarEdicao = () => {
   };
 
   const pdfUnico = async () => {
+    if (bloquearSeAlgumIncompleto()) return;
     setBusy(true);
     try {
       const els = certs.map((c) => docRefs.current[c.id]).filter(Boolean) as HTMLDivElement[];
@@ -302,12 +349,29 @@ const salvarEdicao = () => {
               ))}
             </Card>
 
+            {incompletos.length > 0 && (
+              <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                <p className="font-medium">
+                  Existem itens com informações obrigatórias pendentes. Preencha todos os campos
+                  obrigatórios para gerar o PDF único ou baixar todos os certificados em ZIP.
+                </p>
+                <ul className="mt-2 list-disc space-y-0.5 pl-5 text-xs">
+                  {incompletos.map((c) => (
+                    <li key={c.id}>
+                      Item {c.nItem} ({c.codigoSato}):{" "}
+                      {validacoes.get(c.id)?.pendencias.join(", ")}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* Ações */}
             <div className="flex flex-wrap gap-2">
-              <Button onClick={pdfUnico} disabled={busy || certs.length === 0}>
+              <Button onClick={pdfUnico} disabled={busy || !todosValidos}>
                 {busy ? <Loader2 className="animate-spin" /> : <Layers />} Gerar PDF único
               </Button>
-              <Button variant="outline" onClick={baixarZip} disabled={busy || certs.length === 0}>
+              <Button variant="outline" onClick={baixarZip} disabled={busy || !todosValidos}>
                 {busy ? <Loader2 className="animate-spin" /> : <FileArchive />} Baixar todos (ZIP)
               </Button>
             </div>
@@ -328,7 +392,9 @@ const salvarEdicao = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {certs.map((c) => (
+                  {certs.map((c) => {
+                    const v = validacoes.get(c.id);
+                    return (
                     <TableRow key={c.id}>
                       <TableCell>{c.nItem}</TableCell>
                       <TableCell className="font-medium">{c.codigoSato}</TableCell>
@@ -387,7 +453,8 @@ const salvarEdicao = () => {
                           <Button
                             size="sm"
                             variant="outline"
-                            disabled={busy}
+                            disabled={busy || !v?.valido}
+                            title={v?.valido ? undefined : `Pendente: ${v?.pendencias.join(", ")}`}
                             onClick={() => void baixarUm(c)}
                           >
                             <Download /> PDF
@@ -395,7 +462,8 @@ const salvarEdicao = () => {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                    );
+                  })}
                 </TableBody>
               </Table>
             </Card>
@@ -428,6 +496,11 @@ const salvarEdicao = () => {
               {rascunho?.tipo === "ribbon" ? "Ribbon" : "Etiqueta"}
             </DialogTitle>
           </DialogHeader>
+          {validacaoRascunho && !validacaoRascunho.valido && (
+            <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm text-destructive">
+              Campos obrigatórios pendentes: {validacaoRascunho.pendencias.join(", ")}.
+            </div>
+          )}
           {rascunho && (
             <div className="grid gap-6 lg:grid-cols-[minmax(0,380px)_1fr]">
               <EditorCertificado c={rascunho} onChange={setRascunho} />
@@ -446,7 +519,10 @@ const salvarEdicao = () => {
             <Button variant="secondary" onClick={salvarEdicao}>
               <Save /> Salvar alterações
             </Button>
-            <Button disabled={busy} onClick={() => emEdicao && void baixarUm(emEdicao)}>
+            <Button
+              disabled={busy || !validacaoRascunho?.valido}
+              onClick={() => emEdicao && void baixarUm(emEdicao)}
+            >
               {busy ? <Loader2 className="animate-spin" /> : <Download />} Baixar PDF
             </Button>
           </div>
