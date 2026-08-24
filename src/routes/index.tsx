@@ -190,7 +190,30 @@ const salvarEdicao = () => {
     }
   };
 
+  const bloquearSeIncompleto = (c: Certificado) => {
+    const v = validarCertificado(c);
+    if (!v.valido) {
+      toast.error(
+        `Item ${c.nItem} (${c.codigoSato}) incompleto. Preencha: ${v.pendencias.join(", ")}.`,
+      );
+      return true;
+    }
+    return false;
+  };
+
+  const bloquearSeAlgumIncompleto = () => {
+    const invalidos = certs.filter((c) => !isCertificadoValido(c));
+    if (certs.length === 0 || invalidos.length > 0) {
+      toast.error(
+        "Existem itens com informações obrigatórias pendentes. Preencha todos os campos obrigatórios para gerar o PDF único ou baixar todos os certificados em ZIP.",
+      );
+      return true;
+    }
+    return false;
+  };
+
   const baixarUm = async (c: Certificado) => {
+    if (bloquearSeIncompleto(c)) return;
     const el = docRefs.current[c.id];
     if (!el) return;
     setBusy(true);
