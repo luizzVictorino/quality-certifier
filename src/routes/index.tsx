@@ -73,6 +73,20 @@ function Index() {
 
   const emEdicao = useMemo(() => certs.find((c) => c.id === aberto) ?? null, [certs, aberto]);
 
+  const validacoes = useMemo(
+    () => new Map(certs.map((c) => [c.id, validarCertificado(c)] as const)),
+    [certs],
+  );
+  const incompletos = useMemo(
+    () => certs.filter((c) => !validacoes.get(c.id)?.valido),
+    [certs, validacoes],
+  );
+  const todosValidos = certs.length > 0 && incompletos.length === 0;
+  const validacaoRascunho = useMemo(
+    () => (rascunho ? validarCertificado(rascunho) : null),
+    [rascunho],
+  );
+
   const abrir = (c: Certificado) => {
     setRascunho({ ...c, lotes: c.lotes.map((l) => ({ ...l })) });
     setAberto(c.id);
