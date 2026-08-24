@@ -349,6 +349,23 @@ const salvarEdicao = () => {
               ))}
             </Card>
 
+            {incompletos.length > 0 && (
+              <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                <p className="font-medium">
+                  Existem itens com informações obrigatórias pendentes. Preencha todos os campos
+                  obrigatórios para gerar o PDF único ou baixar todos os certificados em ZIP.
+                </p>
+                <ul className="mt-2 list-disc space-y-0.5 pl-5 text-xs">
+                  {incompletos.map((c) => (
+                    <li key={c.id}>
+                      Item {c.nItem} ({c.codigoSato}):{" "}
+                      {validacoes.get(c.id)?.pendencias.join(", ")}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* Ações */}
             <div className="flex flex-wrap gap-2">
               <Button onClick={pdfUnico} disabled={busy || !todosValidos}>
