@@ -392,7 +392,9 @@ const salvarEdicao = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {certs.map((c) => (
+                  {certs.map((c) => {
+                    const v = validacoes.get(c.id);
+                    return (
                     <TableRow key={c.id}>
                       <TableCell>{c.nItem}</TableCell>
                       <TableCell className="font-medium">{c.codigoSato}</TableCell>
@@ -451,7 +453,8 @@ const salvarEdicao = () => {
                           <Button
                             size="sm"
                             variant="outline"
-                            disabled={busy}
+                            disabled={busy || !v?.valido}
+                            title={v?.valido ? undefined : `Pendente: ${v?.pendencias.join(", ")}`}
                             onClick={() => void baixarUm(c)}
                           >
                             <Download /> PDF
@@ -459,7 +462,8 @@ const salvarEdicao = () => {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                    );
+                  })}
                 </TableBody>
               </Table>
             </Card>
@@ -492,6 +496,11 @@ const salvarEdicao = () => {
               {rascunho?.tipo === "ribbon" ? "Ribbon" : "Etiqueta"}
             </DialogTitle>
           </DialogHeader>
+          {validacaoRascunho && !validacaoRascunho.valido && (
+            <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm text-destructive">
+              Campos obrigatórios pendentes: {validacaoRascunho.pendencias.join(", ")}.
+            </div>
+          )}
           {rascunho && (
             <div className="grid gap-6 lg:grid-cols-[minmax(0,380px)_1fr]">
               <EditorCertificado c={rascunho} onChange={setRascunho} />
@@ -510,7 +519,10 @@ const salvarEdicao = () => {
             <Button variant="secondary" onClick={salvarEdicao}>
               <Save /> Salvar alterações
             </Button>
-            <Button disabled={busy} onClick={() => emEdicao && void baixarUm(emEdicao)}>
+            <Button
+              disabled={busy || !validacaoRascunho?.valido}
+              onClick={() => emEdicao && void baixarUm(emEdicao)}
+            >
               {busy ? <Loader2 className="animate-spin" /> : <Download />} Baixar PDF
             </Button>
           </div>
