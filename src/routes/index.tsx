@@ -225,6 +225,7 @@ const salvarEdicao = () => {
   };
 
   const baixarZip = async () => {
+    if (bloquearSeAlgumIncompleto()) return;
     setBusy(true);
     try {
       const zip = new JSZip();
@@ -242,6 +243,7 @@ const salvarEdicao = () => {
   };
 
   const pdfUnico = async () => {
+    if (bloquearSeAlgumIncompleto()) return;
     setBusy(true);
     try {
       const els = certs.map((c) => docRefs.current[c.id]).filter(Boolean) as HTMLDivElement[];
@@ -349,10 +351,10 @@ const salvarEdicao = () => {
 
             {/* Ações */}
             <div className="flex flex-wrap gap-2">
-              <Button onClick={pdfUnico} disabled={busy || certs.length === 0}>
+              <Button onClick={pdfUnico} disabled={busy || !todosValidos}>
                 {busy ? <Loader2 className="animate-spin" /> : <Layers />} Gerar PDF único
               </Button>
-              <Button variant="outline" onClick={baixarZip} disabled={busy || certs.length === 0}>
+              <Button variant="outline" onClick={baixarZip} disabled={busy || !todosValidos}>
                 {busy ? <Loader2 className="animate-spin" /> : <FileArchive />} Baixar todos (ZIP)
               </Button>
             </div>
