@@ -4,8 +4,11 @@ const path = require("node:path");
 const fs = require("node:fs");
 const os = require("node:os");
 
+const { setupUpdater } = require("./updater.cjs");
+
 const APP_NAME = "Certificado de Qualidade";
 const isDev = !app.isPackaged && process.env.CQ_DEV === "1";
+
 
 // ---------------------------------------------------------------------------
 // Logs em %LOCALAPPDATA%\CertificadoQualidade\logs
