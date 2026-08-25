@@ -4,8 +4,11 @@ const path = require("node:path");
 const fs = require("node:fs");
 const os = require("node:os");
 
+const { setupUpdater } = require("./updater.cjs");
+
 const APP_NAME = "Certificado de Qualidade";
 const isDev = !app.isPackaged && process.env.CQ_DEV === "1";
+
 
 // ---------------------------------------------------------------------------
 // Logs em %LOCALAPPDATA%\CertificadoQualidade\logs
@@ -93,7 +96,9 @@ function createWindow() {
       devTools: isDev,
       webviewTag: false,
       spellcheck: false,
+      preload: path.join(__dirname, "preload.cjs"),
     },
+
   });
 
   mainWindow.setMenuBarVisibility(false);
@@ -145,15 +150,40 @@ app.whenReady().then(() => {
   session.defaultSession.setPermissionRequestHandler((_wc, _perm, cb) => cb(false));
 
   // Bloqueia qualquer requisição de rede externa (app é 100% local).
+  // Única exceção: requisições feitas pelo PROCESSO PRINCIPAL (sem webContents)
+  // para os domínios oficiais do GitHub Releases — usadas pelo electron-updater.
+  const UPDATE_HOSTS = new Set([
+    "github.com",
+    "api.github.com",
+    "objects.githubusercontent.com",
+    "release-assets.githubusercontent.com",
+    "codeload.github.com",
+  ]);
   session.defaultSession.webRequest.onBeforeRequest((details, callback) => {
     const url = details.url;
-    const allowed =
+    let allowed =
       url.startsWith(APP_ORIGIN) || url.startsWith("data:") || url.startsWith("blob:");
+    if (!allowed && details.webContentsId === undefined && url.startsWith("https://")) {
+      try {
+        allowed = UPDATE_HOSTS.has(new URL(url).hostname);
+      } catch {
+        allowed = false;
+      }
+    }
     if (!allowed) log(`requisição externa bloqueada: ${url}`);
     callback({ cancel: !allowed });
   });
 
   createWindow();
+
+  // Atualização automática: nunca bloqueia a abertura da aplicação.
+  try {
+    const updater = setupUpdater(log, () => mainWindow);
+    updater.checkInBackground();
+  } catch (err) {
+    log(`[Updater] Não foi possível iniciar: ${err && err.message ? err.message : err}`);
+  }
+
 });
 
 // Encerramento completo: fechar a janela finaliza o processo em qualquer SO.
