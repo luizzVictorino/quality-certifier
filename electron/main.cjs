@@ -96,7 +96,9 @@ function createWindow() {
       devTools: isDev,
       webviewTag: false,
       spellcheck: false,
+      preload: path.join(__dirname, "preload.cjs"),
     },
+
   });
 
   mainWindow.setMenuBarVisibility(false);
