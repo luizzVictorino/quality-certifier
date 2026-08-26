@@ -274,7 +274,12 @@ const salvarEdicao = () => {
             </p>
           </div>
         </div>
+          <div className="ml-auto">
+            <AtualizacaoApp />
+          </div>
+        </div>
       </header>
+
 
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
         {/* Upload */}
