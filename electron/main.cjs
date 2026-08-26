@@ -13,7 +13,7 @@ const isDev = !app.isPackaged && process.env.CQ_DEV === "1";
 // ---------------------------------------------------------------------------
 // Logs em %LOCALAPPDATA%\CertificadoQualidade\logs
 // ---------------------------------------------------------------------------
-const logDir = path.join(app.getPath("appData"), "CertificadoQualidade", "logs");
+const logDir = path.join(app.getPath("appData"), "CertificadoQualidade", "logs");f
 function log(msg) {
   try {
     fs.mkdirSync(logDir, { recursive: true });
