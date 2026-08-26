@@ -24,6 +24,8 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { CertificadoDoc } from "@/components/CertificadoDoc";
 import { EditorCertificado } from "@/components/EditorCertificado";
+import { AtualizacaoApp } from "@/components/AtualizacaoApp";
+
 import {
   parseNFe,
   nomeArquivo,
@@ -273,8 +275,14 @@ const salvarEdicao = () => {
               Leitura automática do XML da NF-e · Ribbon e Etiqueta · Processamento local
             </p>
           </div>
+          <div className="ml-auto">
+            <AtualizacaoApp />
+          </div>
         </div>
       </header>
+
+
+
 
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
         {/* Upload */}
