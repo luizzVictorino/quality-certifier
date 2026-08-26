@@ -94,7 +94,7 @@
     "typescript-eslint": "^8.56.1",
     "vite": "^8.2.0"
   },
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "electron/main.cjs",
   "description": "Gerador de Certificados de Qualidade a partir do XML da NF-e"
 }
