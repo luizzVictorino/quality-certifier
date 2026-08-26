@@ -1,32 +1,37 @@
 appId: com.sato.certificadoqualidade
-productName: CertificadoQualidade
+productName: Quality Certifier
 copyright: Certificado de Qualidade
 directories:
-  output: /tmp/dist-desktop
+  output: dist-desktop
   buildResources: build
 files:
   - electron/**
   - desktop/dist-web/**/*
   - package.json
-  - '!node_modules/**'
 extraMetadata:
   main: electron/main.cjs
+publish:
+  - provider: github
+    owner: luizzVictorino
+    repo: quality-certifier
+    releaseType: release
 win:
   target:
     - target: nsis
       arch: [x64]
     - target: portable
       arch: [x64]
-  artifactName: CertificadoQualidade-${version}-${arch}.${ext}
+  artifactName: Quality-Certifier-${version}-${arch}.${ext}
   icon: build/icon.ico
 portable:
-  artifactName: CertificadoQualidade.exe
+  artifactName: Quality-Certifier-Portable-${version}.exe
 nsis:
   oneClick: false
   perMachine: false
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: Certificado de Qualidade
-  artifactName: CertificadoQualidade-Setup.exe
-  uninstallDisplayName: Certificado de Qualidade
+  shortcutName: Quality Certifier
+  artifactName: Quality-Certifier-Setup-${version}.exe
+  uninstallDisplayName: Quality Certifier
+  differentialPackage: false
