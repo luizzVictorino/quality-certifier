@@ -24,6 +24,8 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { CertificadoDoc } from "@/components/CertificadoDoc";
 import { EditorCertificado } from "@/components/EditorCertificado";
+import { AtualizacaoApp } from "@/components/AtualizacaoApp";
+
 import {
   parseNFe,
   nomeArquivo,
