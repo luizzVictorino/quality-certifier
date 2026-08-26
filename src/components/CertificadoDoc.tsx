@@ -77,7 +77,7 @@ function TopoEtiqueta({ c }: { c: Certificado }) {
       <table className="doc-tabela doc-tabela-dados">
         <tbody>
           <tr>
-            <th>Código SATO</th>
+            <th>Código SAaTO</th>
             <td>{c.codigoSato}</td>
             <th>Cliente</th>
             <td>{c.cliente}</td>
