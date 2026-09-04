@@ -174,10 +174,14 @@
   letter-spacing: 0.28em;
 }
 
+.doc-tabela2 {
+  margin: 0 0 30px;
+}
+
 .doc-tabela {
   width: 100%;
   border-collapse: collapse;
-  margin: 0 0 16px;
+  margin: 0 0 20px;
   table-layout: fixed;
 }
 .doc-tabela th,
@@ -198,7 +202,7 @@
 }
 .doc-tabela-dados th { background: hsl(195, 93%, 94%); width: 17%; }
 .doc-tabela-dados td { width: 33%; }
-.doc-texto { margin: 10px 0 12px; text-align: left; font-size: 12px; line-height: 1.5; }
+.doc-texto { margin: 10px 0 12px; text-align: left; font-size: 13px; line-height: 1.5; }
 .doc-espaco { flex: 1 1 auto; min-height: 24px; }
 .doc-rodape {
   display: flex;

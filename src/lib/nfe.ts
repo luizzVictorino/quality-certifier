@@ -176,10 +176,14 @@ export function parseNFe(xmlText: string): { resumo: NFeResumo; certificados: Ce
       entintamento: "",
       emitidoPor: "Depto. da Qualidade",
       dataEmissaoCertificado: dataHoje,
-      lotes:
+/*       lotes:
         lotes.length > 0
           ? lotes
           : [{ nLote: "", qLote: formatarQuantidade(qtdTotal), loteFabricante: "" }],
+      semLote: lotes.length === 0, */
+
+      /*Alteração*/
+      lotes,
       semLote: lotes.length === 0,
     };
   });
@@ -195,3 +199,35 @@ export const nomeArquivo = (c: Certificado): string => {
   const partes = ["Certificado", c.notaFiscal, c.codigoSato, lote].filter(Boolean);
   return `${partes.join("_").replace(/[^\w.-]/g, "-")}.pdf`;
 };
+
+/* ------------------------- Validação de certificados ------------------------- */
+
+const vazio = (v: string | undefined | null) => !v || !v.trim();
+
+export type ValidacaoCertificado = {
+  valido: boolean;
+  pendencias: string[];
+};
+
+export function validarCertificado(c: Certificado): ValidacaoCertificado {
+  const pendencias: string[] = [];
+
+  if (c.tipo === "ribbon" && vazio(c.entintamento)) pendencias.push("Ent");
+
+  if (c.lotes.length === 0) {
+    pendencias.push("Lote SATO", "Quantidade");
+    if (c.tipo === "ribbon") pendencias.push("Lote Fabricante");
+  } else {
+    c.lotes.forEach((l, i) => {
+      const n = c.lotes.length > 1 ? ` (lote ${i + 1})` : "";
+      if (vazio(l.nLote)) pendencias.push(`Lote SATO${n}`);
+      if (vazio(l.qLote)) pendencias.push(`Quantidade${n}`);
+      if (c.tipo === "ribbon" && vazio(l.loteFabricante))
+        pendencias.push(`Lote Fabricante${n}`);
+    });
+  }
+
+  return { valido: pendencias.length === 0, pendencias: [...new Set(pendencias)] };
+}
+
+export const isCertificadoValido = (c: Certificado): boolean => validarCertificado(c).valido;

@@ -24,7 +24,17 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { CertificadoDoc } from "@/components/CertificadoDoc";
 import { EditorCertificado } from "@/components/EditorCertificado";
-import { parseNFe, nomeArquivo, NFeError, type Certificado, type NFeResumo } from "@/lib/nfe";
+import { AtualizacaoApp } from "@/components/AtualizacaoApp";
+
+import {
+  parseNFe,
+  nomeArquivo,
+  NFeError,
+  validarCertificado,
+  isCertificadoValido,
+  type Certificado,
+  type NFeResumo,
+} from "@/lib/nfe";
 import { elementToPdfBlob, elementsToSinglePdfBlob, downloadBlob } from "@/lib/pdf";
 
 export const Route = createFileRoute("/")({
@@ -65,6 +75,20 @@ function Index() {
 
   const emEdicao = useMemo(() => certs.find((c) => c.id === aberto) ?? null, [certs, aberto]);
 
+  const validacoes = useMemo(
+    () => new Map(certs.map((c) => [c.id, validarCertificado(c)] as const)),
+    [certs],
+  );
+  const incompletos = useMemo(
+    () => certs.filter((c) => !validacoes.get(c.id)?.valido),
+    [certs, validacoes],
+  );
+  const todosValidos = certs.length > 0 && incompletos.length === 0;
+  const validacaoRascunho = useMemo(
+    () => (rascunho ? validarCertificado(rascunho) : null),
+    [rascunho],
+  );
+
   const abrir = (c: Certificado) => {
     setRascunho({ ...c, lotes: c.lotes.map((l) => ({ ...l })) });
     setAberto(c.id);
@@ -75,12 +99,51 @@ function Index() {
     setRascunho(null);
   };
 
-  const salvarEdicao = () => {
+/*   const salvarEdicao = () => {
     if (!rascunho) return;
     setCerts((prev) => prev.map((x) => (x.id === rascunho.id ? rascunho : x)));
     toast.success("Informações do certificado salvas.");
     fechar();
+  }; */
+
+  const formatarQuantidadeLote = (valor: string) => {
+  if (!valor.trim()) return "";
+
+  const numero = Number(
+    valor.replace(/\./g, "").replace(",", ".")
+  );
+
+  if (Number.isNaN(numero)) return valor;
+
+  return numero.toFixed(3).replace(".", ",");
+};
+
+const salvarEdicao = () => {
+  if (!rascunho) return;
+
+  const certificadoAtualizado: Certificado = {
+    ...rascunho,
+    lotes: rascunho.lotes.map((lote) => ({
+      ...lote,
+      qLote: formatarQuantidadeLote(lote.qLote),
+    })),
   };
+
+  setCerts((prev) =>
+    prev.map((x) =>
+      x.id === certificadoAtualizado.id
+        ? certificadoAtualizado
+        : x
+    )
+  );
+
+  toast.success("Informações do certificado salvas.");
+
+  fechar();
+};
+
+
+  /*----------------------------------------------------------------------------*/
 
   const limpar = () => {
     setFile(null);
@@ -129,7 +192,30 @@ function Index() {
     }
   };
 
+  const bloquearSeIncompleto = (c: Certificado) => {
+    const v = validarCertificado(c);
+    if (!v.valido) {
+      toast.error(
+        `Item ${c.nItem} (${c.codigoSato}) incompleto. Preencha: ${v.pendencias.join(", ")}.`,
+      );
+      return true;
+    }
+    return false;
+  };
+
+  const bloquearSeAlgumIncompleto = () => {
+    const invalidos = certs.filter((c) => !isCertificadoValido(c));
+    if (certs.length === 0 || invalidos.length > 0) {
+      toast.error(
+        "Existem itens com informações obrigatórias pendentes. Preencha todos os campos obrigatórios para gerar o PDF único ou baixar todos os certificados em ZIP.",
+      );
+      return true;
+    }
+    return false;
+  };
+
   const baixarUm = async (c: Certificado) => {
+    if (bloquearSeIncompleto(c)) return;
     const el = docRefs.current[c.id];
     if (!el) return;
     setBusy(true);
@@ -141,6 +227,7 @@ function Index() {
   };
 
   const baixarZip = async () => {
+    if (bloquearSeAlgumIncompleto()) return;
     setBusy(true);
     try {
       const zip = new JSZip();
@@ -158,6 +245,7 @@ function Index() {
   };
 
   const pdfUnico = async () => {
+    if (bloquearSeAlgumIncompleto()) return;
     setBusy(true);
     try {
       const els = certs.map((c) => docRefs.current[c.id]).filter(Boolean) as HTMLDivElement[];
@@ -187,8 +275,14 @@ function Index() {
               Leitura automática do XML da NF-e · Ribbon e Etiqueta · Processamento local
             </p>
           </div>
+          <div className="ml-auto">
+            <AtualizacaoApp />
+          </div>
         </div>
       </header>
+
+
+
 
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
         {/* Upload */}
@@ -263,12 +357,29 @@ function Index() {
               ))}
             </Card>
 
+            {incompletos.length > 0 && (
+              <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                <p className="font-medium">
+                  Existem itens com informações obrigatórias pendentes. Preencha todos os campos
+                  obrigatórios para gerar o PDF único ou baixar todos os certificados em ZIP.
+                </p>
+                <ul className="mt-2 list-disc space-y-0.5 pl-5 text-xs">
+                  {incompletos.map((c) => (
+                    <li key={c.id}>
+                      Item {c.nItem} ({c.codigoSato}):{" "}
+                      {validacoes.get(c.id)?.pendencias.join(", ")}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* Ações */}
             <div className="flex flex-wrap gap-2">
-              <Button onClick={pdfUnico} disabled={busy || certs.length === 0}>
+              <Button onClick={pdfUnico} disabled={busy || !todosValidos}>
                 {busy ? <Loader2 className="animate-spin" /> : <Layers />} Gerar PDF único
               </Button>
-              <Button variant="outline" onClick={baixarZip} disabled={busy || certs.length === 0}>
+              <Button variant="outline" onClick={baixarZip} disabled={busy || !todosValidos}>
                 {busy ? <Loader2 className="animate-spin" /> : <FileArchive />} Baixar todos (ZIP)
               </Button>
             </div>
@@ -289,7 +400,9 @@ function Index() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {certs.map((c) => (
+                  {certs.map((c) => {
+                    const v = validacoes.get(c.id);
+                    return (
                     <TableRow key={c.id}>
                       <TableCell>{c.nItem}</TableCell>
                       <TableCell className="font-medium">{c.codigoSato}</TableCell>
@@ -312,6 +425,32 @@ function Index() {
                         {c.lotes.map((l, i) => (
                           <div key={i}>{l.qLote}</div>
                         ))}
+
+
+{/*                       <TableCell className="text-xs">
+                        {c.lotes.length === 0 ? (
+                          <span className="text-muted-foreground">
+                            Sem lote informado
+                          </span>
+                        ) : (
+                          c.lotes
+                            .filter((l) => l.nLote.trim() !== "")
+                            .map((l, i) => <div key={i}>{l.nLote}</div>)
+                        )}
+                      </TableCell>
+                      
+                      <TableCell className="text-xs">
+                        {c.lotes.length === 0 ? (
+                          <span>{c.quantidadeTotal}</span>
+                        ) : (
+                          c.lotes
+                            .filter((l) => l.nLote.trim() !== "")
+                            .map((l, i) => <div key={i}>{l.qLote}</div>)
+                        )}
+                      </TableCell> */}
+
+
+                      { /*----------------------*/}
                       </TableCell>
                       <TableCell>{c.unidade}</TableCell>
                       <TableCell className="text-right">
@@ -322,7 +461,8 @@ function Index() {
                           <Button
                             size="sm"
                             variant="outline"
-                            disabled={busy}
+                            disabled={busy || !v?.valido}
+                            title={v?.valido ? undefined : `Pendente: ${v?.pendencias.join(", ")}`}
                             onClick={() => void baixarUm(c)}
                           >
                             <Download /> PDF
@@ -330,7 +470,8 @@ function Index() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                    );
+                  })}
                 </TableBody>
               </Table>
             </Card>
@@ -353,13 +494,21 @@ function Index() {
 
       {/* Visualização + edição */}
       <Dialog open={!!emEdicao && !!rascunho} onOpenChange={(o) => !o && fechar()}>
-        <DialogContent className="max-h-[92vh] max-w-[1200px] overflow-y-auto">
+        <DialogContent
+          className="max-h-[92vh] max-w-[1200px] overflow-y-auto"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle>
               Certificado {rascunho?.codigoSato} —{" "}
               {rascunho?.tipo === "ribbon" ? "Ribbon" : "Etiqueta"}
             </DialogTitle>
           </DialogHeader>
+          {validacaoRascunho && !validacaoRascunho.valido && (
+            <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm text-destructive">
+              Campos obrigatórios pendentes: {validacaoRascunho.pendencias.join(", ")}.
+            </div>
+          )}
           {rascunho && (
             <div className="grid gap-6 lg:grid-cols-[minmax(0,380px)_1fr]">
               <EditorCertificado c={rascunho} onChange={setRascunho} />
@@ -370,6 +519,7 @@ function Index() {
               </div>
             </div>
           )}
+
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={fechar}>
               Fechar
@@ -377,7 +527,10 @@ function Index() {
             <Button variant="secondary" onClick={salvarEdicao}>
               <Save /> Salvar alterações
             </Button>
-            <Button disabled={busy} onClick={() => emEdicao && void baixarUm(emEdicao)}>
+            <Button
+              disabled={busy || !validacaoRascunho?.valido}
+              onClick={() => emEdicao && void baixarUm(emEdicao)}
+            >
               {busy ? <Loader2 className="animate-spin" /> : <Download />} Baixar PDF
             </Button>
           </div>

@@ -438,7 +438,25 @@ npm run lint     # análise estática
 
 Em desenvolvimento a aplicação fica disponível em `http://localhost:8080`.
 
+### 🖥️ Aplicativo Windows e atualização automática
+
+```sh
+npm run build:desktop   # build estático usado pelo executável
+npm run desktop:start   # abre a janela Electron
+npm run dist:win        # gera Quality-Certifier-Setup-<versão>.exe (NSIS) + portátil
+```
+
+A distribuição oficial é o instalador NSIS publicado no GitHub Releases
+(`luizzVictorino/quality-certifier`). O app verifica novas versões em segundo plano com
+`electron-updater`, avisa o usuário, baixa, instala e reinicia — sem substituir pastas
+manualmente. Sem internet, tudo continua funcionando offline.
+
+Para publicar uma nova versão: atualize o `package.json`, faça commit/push e crie a tag
+(`git tag v1.0.1 && git push origin v1.0.1`); o GitHub Actions gera e publica a release.
+Detalhes completos em [docs/RELEASE.md](docs/RELEASE.md).
+
 ---
+
 
 ## 🖱️ Utilização
 

@@ -15,6 +15,7 @@ export default defineConfig({
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
+    dedupe: ["react", "react-dom"],
   },
   build: {
     outDir: fileURLToPath(new URL("./desktop/dist-web", import.meta.url)),
@@ -22,3 +23,5 @@ export default defineConfig({
     target: "chrome110",
   },
 });
+
+

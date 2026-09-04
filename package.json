@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "build:desktop": "vite build -c vite.desktop.config.ts",
     "desktop:start": "electron .",
-    "dist:win": "npm run build:desktop && electron-builder --win --config electron-builder.yml"
+    "dist:win": "npm run build:desktop && electron-builder --win --config electron-builder.yml",
+    "dist:win:publish": "npm run build:desktop && electron-builder --win --config electron-builder.yml --publish always"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -51,6 +52,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "electron-updater": "^6.8.9",
     "embla-carousel-react": "^8.6.0",
     "html2canvas-pro": "^2.3.5",
     "input-otp": "^1.4.2",
@@ -92,7 +94,7 @@
     "typescript-eslint": "^8.56.1",
     "vite": "^8.2.0"
   },
-  "version": "1.0.0",
+  "version": "1.2.0",
   "main": "electron/main.cjs",
   "description": "Gerador de Certificados de Qualidade a partir do XML da NF-e"
 }
