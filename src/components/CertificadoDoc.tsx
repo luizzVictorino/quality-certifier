@@ -30,6 +30,21 @@ const Rodape = ({ c }: { c: Certificado }) => (
 
 /* ---------- blocos ---------- */
 
+function TabelaCodigoCliente({ c }: { c: Certificado }) {
+  if (!c.exibeCodigoCliente) return null;
+  return (
+    <table className="doc-tabela doc-tabela-dados">
+      <tbody>
+        <tr>
+          <th style={{ width: "17%" }}>Código Cliente:</th>
+          <td>{c.codigoCliente?.trim() || "—"}</td>
+        </tr>
+      </tbody>
+    </table>
+  );
+}
+
+
 function TopoRibbon({ c }: { c: Certificado }) {
   return (
     <>
