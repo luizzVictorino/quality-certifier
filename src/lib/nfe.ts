@@ -135,6 +135,7 @@ export function parseNFe(xmlText: string): { resumo: NFeResumo; certificados: Ce
   const dest = doc.getElementsByTagName("dest")[0];
   const cliente = txt(dest, "xNome");
   if (!cliente) throw new NFeError("NF-e sem o nome do destinatário (<dest><xNome>).");
+  const exibeCodigoCliente = clientePermiteCodigoCliente(txt(dest, "CNPJ"));
 
   const dets = Array.from(doc.getElementsByTagName("det"));
   if (dets.length === 0) throw new NFeError("NF-e sem itens (<det>).");
