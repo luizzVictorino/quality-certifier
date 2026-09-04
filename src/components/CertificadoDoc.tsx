@@ -117,6 +117,7 @@ function TopoEtiqueta({ c }: { c: Certificado }) {
           </tr>
         </tbody>
       </table>
+      <TabelaCodigoCliente c={c} />
     </>
   );
 }
@@ -124,7 +125,9 @@ function TopoEtiqueta({ c }: { c: Certificado }) {
 function BaseRibbon({ c }: { c: Certificado }) {
   return (
     <>
+      <TabelaCodigoCliente c={c} />
       <table className="doc-tabela .doc-tabela2">
+
         <thead>
           <tr>
             <th>NOTA FISCAL</th>
