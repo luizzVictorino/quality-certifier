@@ -205,6 +205,10 @@ export function parseNFe(xmlText: string): { resumo: NFeResumo; certificados: Ce
       /*Alteração*/
       lotes,
       semLote: lotes.length === 0,
+      exibeCodigoCliente,
+      codigoCliente: exibeCodigoCliente
+        ? (extrairCodigoCliente(kids(det, "infAdProd")[0]?.textContent) ?? "")
+        : "",
     };
   });
 
