@@ -30,6 +30,9 @@ export type Certificado = {
   dataEmissaoCertificado: string;
   lotes: Lote[];
   semLote: boolean;
+  /** Somente para clientes com regra de código de cliente (ex.: Delly Kosmetic). */
+  exibeCodigoCliente: boolean;
+  codigoCliente: string;
 };
 
 export type NFeResumo = {
