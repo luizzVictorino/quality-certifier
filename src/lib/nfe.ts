@@ -30,6 +30,9 @@ export type Certificado = {
   dataEmissaoCertificado: string;
   lotes: Lote[];
   semLote: boolean;
+  /** Somente para clientes com regra de código de cliente (ex.: Delly Kosmetic). */
+  exibeCodigoCliente: boolean;
+  codigoCliente: string;
 };
 
 export type NFeResumo = {
@@ -91,6 +94,22 @@ const extrairEtqPorRolo = (xProd: string): string => {
   return m?.[1] ?? "";
 };
 
+/** CNPJ do cliente que exige o campo "Código Cliente" no certificado. */
+export const CNPJ_DELLY_KOSMETIC = "01567613000178";
+
+export const normalizarCNPJ = (v: string | null | undefined): string =>
+  (v ?? "").replace(/\D/g, "");
+
+export const clientePermiteCodigoCliente = (cnpj: string | null | undefined): boolean =>
+  normalizarCNPJ(cnpj) === CNPJ_DELLY_KOSMETIC;
+
+/** Extrai o valor após "Codigo Cliente :" do <infAdProd>. */
+export function extrairCodigoCliente(infAdProd: string | null | undefined): string | null {
+  if (!infAdProd) return null;
+  const match = infAdProd.match(/c[oó]digo\s*cliente\s*:\s*(\S+)/i);
+  return match?.[1]?.trim() ?? null;
+}
+
 export function parseNFe(xmlText: string): { resumo: NFeResumo; certificados: Certificado[] } {
   const doc = new DOMParser().parseFromString(xmlText, "application/xml");
   if (doc.getElementsByTagName("parsererror").length > 0) {
@@ -116,6 +135,7 @@ export function parseNFe(xmlText: string): { resumo: NFeResumo; certificados: Ce
   const dest = doc.getElementsByTagName("dest")[0];
   const cliente = txt(dest, "xNome");
   if (!cliente) throw new NFeError("NF-e sem o nome do destinatário (<dest><xNome>).");
+  const exibeCodigoCliente = clientePermiteCodigoCliente(txt(dest, "CNPJ"));
 
   const dets = Array.from(doc.getElementsByTagName("det"));
   if (dets.length === 0) throw new NFeError("NF-e sem itens (<det>).");
@@ -185,6 +205,10 @@ export function parseNFe(xmlText: string): { resumo: NFeResumo; certificados: Ce
       /*Alteração*/
       lotes,
       semLote: lotes.length === 0,
+      exibeCodigoCliente,
+      codigoCliente: exibeCodigoCliente
+        ? (extrairCodigoCliente(kids(det, "infAdProd")[0]?.textContent) ?? "")
+        : "",
     };
   });
 

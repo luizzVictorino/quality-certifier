@@ -124,6 +124,14 @@ export function EditorCertificado({ c, onChange }: Props) {
             onChange={(v) => set({ entintamento: v })} 
           />
         )}
+        {c.exibeCodigoCliente && (
+          <Campo
+            label="Código Cliente"
+            value={c.codigoCliente}
+            onChange={(v) => set({ codigoCliente: v })}
+          />
+        )}
+
 
         <Campo 
           label="Nota Fiscal" 
